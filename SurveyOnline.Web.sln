@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyOnline.Web", "SurveyOnline.Web\SurveyOnline.Web.csproj", "{E149EC4C-57E7-4F08-B0BE-0B6BF1823DD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyOnline.DAL", "SurveyOnline.DAL\SurveyOnline.DAL.csproj", "{B7A2572B-D3D5-4C0D-89CF-F0CE22AD3847}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurveyOnline.BLL", "SurveyOnline.BLL\SurveyOnline.BLL.csproj", "{5DE6DA04-03A9-4B1B-BD71-89E6F602390B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E149EC4C-57E7-4F08-B0BE-0B6BF1823DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E149EC4C-57E7-4F08-B0BE-0B6BF1823DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E149EC4C-57E7-4F08-B0BE-0B6BF1823DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E149EC4C-57E7-4F08-B0BE-0B6BF1823DD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7A2572B-D3D5-4C0D-89CF-F0CE22AD3847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7A2572B-D3D5-4C0D-89CF-F0CE22AD3847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7A2572B-D3D5-4C0D-89CF-F0CE22AD3847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7A2572B-D3D5-4C0D-89CF-F0CE22AD3847}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DE6DA04-03A9-4B1B-BD71-89E6F602390B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DE6DA04-03A9-4B1B-BD71-89E6F602390B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DE6DA04-03A9-4B1B-BD71-89E6F602390B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DE6DA04-03A9-4B1B-BD71-89E6F602390B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
