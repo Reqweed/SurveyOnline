@@ -1,0 +1,45 @@
+@page
+@model SurveyOnline.Web.Pages.AdminPanel
+
+@{
+    Layout = "Shared/_Layout";
+}
+
+<form method="post">
+    <div class="actions">
+        <button type="submit" class="btn btn-secondary" asp-page-handler="Block">Block</button>
+        <button type="submit" class="btn btn-secondary" asp-page-handler="Unblock">Unblock</button>
+        <button type="submit" class="btn btn-danger" asp-page-handler="Delete">Delete</button>
+        <button type="submit" class="btn btn-secondary" asp-page-handler="MakeAdmin">Make Admin</button>
+        <button type="submit" class="btn btn-secondary" asp-page-handler="MakeUser">Make User</button>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>
+                <input class="table__checkbox" type="checkbox"/>
+            </th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in Model.Users)
+        {
+            <tr>
+                <td>
+                    <input class="checkbox__selected-user" name="SelectedUsers" type="checkbox" value="@user.Id"/>
+                </td>
+                <td>@user.UserName</td>
+                <td>@user.Email</td>
+                <td>@user.Role</td>
+                <td>@user.Status</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</form>
+<script src="js/table-checkboxes.js"></script>
