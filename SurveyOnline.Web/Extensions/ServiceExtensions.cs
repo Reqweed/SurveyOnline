@@ -50,4 +50,9 @@ public static class ServiceExtensions
     {
         serviceCollection.AddScoped<IRepositoryManager, RepositoryManager>();
     }
+    
+    public static void AddMapper(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddAutoMapper(typeof(SurveyOnline.BLL.MapperProfiles.MapperProfile).Assembly); // TODO
+    }
 }
