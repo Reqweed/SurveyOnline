@@ -65,4 +65,10 @@ public static class ServiceExtensions
     {
         serviceCollection.AddScoped<IServiceManager, ServiceManager>();
     }
+    
+    public static void AddMiddlewares(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<CheckUserLockoutMiddleware>();
+    }
+    
 }
