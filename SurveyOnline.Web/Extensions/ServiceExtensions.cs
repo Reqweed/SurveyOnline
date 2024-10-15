@@ -55,4 +55,14 @@ public static class ServiceExtensions
     {
         serviceCollection.AddAutoMapper(typeof(SurveyOnline.BLL.MapperProfiles.MapperProfile).Assembly); // TODO
     }
+    
+    public static void AddHelpers(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<ICloudinaryService, CloudinaryService>();
+    }
+    
+    public static void AddServiceManger(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IServiceManager, ServiceManager>();
+    }
 }
