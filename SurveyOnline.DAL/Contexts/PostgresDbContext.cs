@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SurveyOnline.DAL.Entities.Models;
@@ -6,7 +7,10 @@ using SurveyOnline.DAL.Initializers;
 namespace SurveyOnline.DAL.Contexts;
 
 public class PostgresDbContext
-    (DbContextOptions<PostgresDbContext> options) : IdentityDbContext<User, Role, Guid>(options)
+    (DbContextOptions<PostgresDbContext> options) : IdentityDbContext<
+        User, Role, Guid,
+        IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>(options)
 {
     public DbSet<Answer> Answers { get; set; }
     public DbSet<CompletedSurvey> CompletedSurveys { get; set; }
@@ -19,12 +23,22 @@ public class PostgresDbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.AccessibleSurveys)
-            .WithMany(s => s.AccessibleUsers);
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.OwnSurveys)
-            .WithOne(s => s.Creator);
+        modelBuilder.Entity<User>(userTable =>
+        {
+            userTable.HasMany(u => u.AccessibleSurveys)
+                .WithMany(s => s.AccessibleUsers);
+            userTable.HasMany(u => u.OwnSurveys)
+                .WithOne(s => s.Creator);
+            userTable.HasMany(e => e.UserRoles)
+                .WithOne(e => e.User)
+                .HasForeignKey(ur => ur.UserId);
+        });
+
+        modelBuilder.Entity<Role>()
+            .HasMany(e => e.UserRoles)
+            .WithOne(e => e.Role)
+            .HasForeignKey(ur => ur.RoleId);
+        
         modelBuilder.Entity<Survey>()
             .HasMany(s => s.Tags)
             .WithMany(t => t.Surveys);
@@ -32,5 +46,10 @@ public class PostgresDbContext
         modelBuilder.Entity<Role>().HasData(DataInitializer.Roles);
         modelBuilder.Entity<Tag>().HasData(DataInitializer.Tags);
         modelBuilder.Entity<Topic>().HasData(DataInitializer.Topics);
+    }
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseLazyLoadingProxies();
     }
 }

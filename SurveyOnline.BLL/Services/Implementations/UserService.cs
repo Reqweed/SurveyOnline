@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using SurveyOnline.BLL.Entities.DTOs.User;
 using SurveyOnline.BLL.Entities.Enums;
 using SurveyOnline.BLL.Services.Contracts;
@@ -9,14 +10,11 @@ namespace SurveyOnline.BLL.Services.Implementations;
 
 public class UserService(SignInManager<User> signInManager, IMapper mapper) : IUserService
 {
-    public IEnumerable<UserForManagementDto> GetAllUser() // TODO
+    public async Task<IEnumerable<UserForManagementDto>> GetAllUserAsync()
     {
-        var usersDto = signInManager.UserManager.Users.ToList().Select(u =>
-        {
-            var userDto = mapper.Map<User, UserForManagementDto>(u);
-            userDto.Role = signInManager.UserManager.GetRolesAsync(u).Result[0];
-            return userDto;
-        });
+        var users = await signInManager.UserManager.Users.ToListAsync();
+        
+        var usersDto = mapper.Map<IEnumerable<User>, IEnumerable<UserForManagementDto>>(users);
         
         return usersDto;
     }

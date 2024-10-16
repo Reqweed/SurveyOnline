@@ -5,5 +5,5 @@ public class Tag
     public Guid Id { get; set; }
     public string Name { get; set; }
 
-    public ICollection<Survey> Surveys { get; set; }
+    public virtual ICollection<Survey> Surveys { get; set; }
 }

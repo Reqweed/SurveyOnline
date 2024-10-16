@@ -11,13 +11,13 @@ public class Survey
     public int CompletedCount { get; set; } // TODO
 
     public Guid TopicId { get; set; }
-    public Topic Topic { get; set; }
+    public virtual Topic Topic { get; set; }
 
     public Guid CreatorId { get; set; }
-    public User Creator { get; set; }
+    public virtual User Creator { get; set; }
 
-    public ICollection<Question> Questions { get; set; } = new List<Question>();
-    public ICollection<CompletedSurvey> CompletedSurveys { get; set; } = new List<CompletedSurvey>();
-    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
-    public ICollection<User> AccessibleUsers { get; set; } = new List<User>();
+    public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
+    public virtual ICollection<CompletedSurvey> CompletedSurveys { get; set; } = new List<CompletedSurvey>();
+    public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public virtual ICollection<User> AccessibleUsers { get; set; } = new List<User>();
 }

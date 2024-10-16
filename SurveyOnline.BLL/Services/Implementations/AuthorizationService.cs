@@ -20,7 +20,6 @@ public class AuthorizationService(SignInManager<User> signInManager) : IAuthoriz
             await signInManager.UserManager.RemoveFromRoleAsync(user, role);
         }
         
-        Console.WriteLine(roleType.ToString());
         var result = await signInManager.UserManager.AddToRoleAsync(user, roleType.ToString());
         if(!result.Succeeded) 
             throw new Exception();

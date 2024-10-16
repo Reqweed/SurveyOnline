@@ -6,8 +6,8 @@ public class Answer
     public string AnswerValue { get; set; }
 
     public Guid CompletedSurveyId { get; set; }
-    public CompletedSurvey CompletedSurvey { get; set; }
+    public virtual CompletedSurvey CompletedSurvey { get; set; }
 
     public Guid QuestionId { get; set; }
-    public Question Question { get; set; }
+    public virtual Question Question { get; set; }
 }
