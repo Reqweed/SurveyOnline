@@ -10,6 +10,7 @@ using SurveyOnline.DAL.Repositories.Contracts;
 using SurveyOnline.DAL.Repositories.Implementations;
 using SurveyOnline.DAL.Triggers;
 using SurveyOnline.Web.Middlewares;
+using SurveyOnline.Web.Pages;
 
 namespace SurveyOnline.Web.Extensions;
 
@@ -38,12 +39,11 @@ public static class ServiceExtensions
             })
             .AddEntityFrameworkStores<PostgresDbContext>();
         
-        serviceCollection.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Login"; // TODO
-                options.LogoutPath = "/Logout";
-            });
+        serviceCollection.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = $"/{nameof(Register)}"; 
+            options.LogoutPath = "/Logout";
+        });
     }
     
     public static void AddRepositoryManager(this IServiceCollection serviceCollection)
