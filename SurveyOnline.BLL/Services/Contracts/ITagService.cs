@@ -4,5 +4,6 @@ namespace SurveyOnline.BLL.Services.Contracts;
 
 public interface ITagService
 {
-    IEnumerable<TagDto> GetAllTags();
+    Task<IEnumerable<TagDto>> GetAllTagsAsync();
+    Task<IEnumerable<TagForCloudDto>> GetAllTagsForCloudAsync();
 }

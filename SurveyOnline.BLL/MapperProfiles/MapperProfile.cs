@@ -15,20 +15,28 @@ public class MapperProfile : Profile
     {
         CreateMap<UserForRegistrationDto, User>();
         CreateMap<UserForLoginDto, User>();
+        CreateMap<User, UserForSearchingDto>();
         CreateMap<User, UserForManagementDto>()
             .ConstructUsing(src => new UserForManagementDto(
                 src.Id, 
                 src.UserName, 
                 src.Email,
-                null, // TODO
-                src.LockoutEnd > DateTimeOffset.UtcNow ? Status.Block : Status.Unblock));
+                src.UserRoles.First().Role.Name,
+                src.LockoutEnd > DateTimeOffset.UtcNow ? Status.Block : Status.Unblock)
+            );
 
         CreateMap<Topic, TopicDto>();
-        
         CreateMap<Tag, TagDto>();
-        CreateMap<TagDto, Tag>();
 
         CreateMap<SurveyForCreatedDto, Survey>();
+        CreateMap<Survey, SurveyDto>()
+            .ConstructUsing(src => new SurveyDto(
+                src.Id, 
+                src.Title,
+                src.UrlImage,
+                src.Description,
+                src.Creator.UserName)
+            );
         
         CreateMap<QuestionForCreatedDto, Question>();
     }

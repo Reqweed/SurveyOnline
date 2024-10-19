@@ -13,7 +13,7 @@ public class TagRepository(PostgresDbContext context) : BaseRepository<Tag>(cont
         await FindAll(trackChanges).Where(s => s.Id == idTag).SingleOrDefaultAsync();
 
     public async Task CreateTagAsync(Tag tag) => await CreateAsync(tag);
-
+    
     public void UpdateTag(Tag tag) => Update(tag);
 
     public void DeleteTag(Tag tag) => Delete(tag);

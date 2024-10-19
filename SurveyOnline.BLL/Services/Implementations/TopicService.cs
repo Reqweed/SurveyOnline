@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SurveyOnline.BLL.Entities.DTOs.Topic;
 using SurveyOnline.BLL.Services.Contracts;
 using SurveyOnline.DAL.Entities.Models;
@@ -8,9 +9,9 @@ namespace SurveyOnline.BLL.Services.Implementations;
 
 public class TopicService(IRepositoryManager repositoryManager, IMapper mapper) : ITopicService
 {
-    public IEnumerable<TopicDto> GetAllTopics()
+    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync()
     {
-        var topics = repositoryManager.Topic.GetAllTopics(false).ToList();
+        var topics = await repositoryManager.Topic.GetAllTopics(false).ToListAsync();
 
         var topicsDto = mapper.Map<IEnumerable<Topic>,IEnumerable<TopicDto>>(topics);
 

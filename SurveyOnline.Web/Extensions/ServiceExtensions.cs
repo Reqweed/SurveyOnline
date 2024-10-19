@@ -11,6 +11,7 @@ using SurveyOnline.DAL.Repositories.Implementations;
 using SurveyOnline.DAL.Triggers;
 using SurveyOnline.Web.Middlewares;
 using SurveyOnline.Web.Pages;
+using Index = SurveyOnline.Web.Pages.Index;
 
 namespace SurveyOnline.Web.Extensions;
 
@@ -42,7 +43,7 @@ public static class ServiceExtensions
         serviceCollection.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = $"/{nameof(Register)}"; 
-            options.LogoutPath = "/Logout";
+            options.LogoutPath = $"/{nameof(Index)}";
         });
     }
     

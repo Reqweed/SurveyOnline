@@ -21,7 +21,7 @@ public class ServiceManager : IServiceManager
         _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(signInManager, mapper));
         _authorizationService = new Lazy<IAuthorizationService>(() => new AuthorizationService(signInManager));
         _userService = new Lazy<IUserService>(() => new UserService(signInManager, mapper));
-        _surveyService = new Lazy<ISurveyService>(() => new SurveyService(repositoryManager,cloudinaryService, mapper));
+        _surveyService = new Lazy<ISurveyService>(() => new SurveyService(signInManager, repositoryManager,cloudinaryService, mapper));
         _topicService = new Lazy<ITopicService>(() => new TopicService(repositoryManager, mapper));
         _tagService = new Lazy<ITagService>(() => new TagService(repositoryManager, mapper));
     }

@@ -25,11 +25,14 @@ public class PostgresDbContext
 
         modelBuilder.Entity<User>(userTable =>
         {
-            userTable.HasMany(u => u.AccessibleSurveys)
+            userTable
+                .HasMany(u => u.AccessibleSurveys)
                 .WithMany(s => s.AccessibleUsers);
-            userTable.HasMany(u => u.OwnSurveys)
+            userTable
+                .HasMany(u => u.OwnSurveys)
                 .WithOne(s => s.Creator);
-            userTable.HasMany(e => e.UserRoles)
+            userTable
+                .HasMany(e => e.UserRoles)
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId);
         });

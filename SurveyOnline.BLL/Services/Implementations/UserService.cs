@@ -10,11 +10,24 @@ namespace SurveyOnline.BLL.Services.Implementations;
 
 public class UserService(SignInManager<User> signInManager, IMapper mapper) : IUserService
 {
-    public async Task<IEnumerable<UserForManagementDto>> GetAllUserAsync()
+    public async Task<IEnumerable<UserForManagementDto>> GetAllUsersAsync()
     {
         var users = await signInManager.UserManager.Users.ToListAsync();
         
         var usersDto = mapper.Map<IEnumerable<User>, IEnumerable<UserForManagementDto>>(users);
+        
+        return usersDto;
+    }
+
+    public async Task<IEnumerable<UserForSearchingDto>> GetUsersByQueryAsync(string query, int usersCount)
+    {
+        var queryLower = query.ToLower();
+        var users = await signInManager.UserManager.Users.
+            Where(user => user.Email.ToLower().Contains(queryLower) 
+                          || user.UserName.ToLower().Contains(queryLower))
+            .Take(usersCount).ToListAsync();
+        
+        var usersDto = mapper.Map<IEnumerable<User>, IEnumerable<UserForSearchingDto>>(users);
         
         return usersDto;
     }

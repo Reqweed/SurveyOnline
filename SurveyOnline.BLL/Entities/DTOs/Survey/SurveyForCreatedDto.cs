@@ -8,5 +8,5 @@ public class SurveyForCreatedDto
     public string Description { get; set; }
     public string TopicName { get; set; }
     public bool IsPublic { get; set; }
-    public IFormFile Image { get; set; }
+    public IFormFile? Image { get; set; }
 }
