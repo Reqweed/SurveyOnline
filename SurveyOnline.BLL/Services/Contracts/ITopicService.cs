@@ -4,5 +4,5 @@ namespace SurveyOnline.BLL.Services.Contracts;
 
 public interface ITopicService
 {
-    Task<IEnumerable<TopicDto>> GetAllTopicsAsync();
+    Task<IEnumerable<TopicDto>> GetTopicsByQueryAsync(string query, int countTopic);
 }

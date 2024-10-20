@@ -15,14 +15,14 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
     ICloudinaryService cloudinaryService, IMapper mapper) : ISurveyService
 {
     public async Task CreateSurveyAsync(SurveyForCreatedDto surveyDto,
-        List<QuestionForCreatedDto> questionsDto, List<Guid> tagIds, List<Guid> userIds)
+        List<QuestionForCreatedDto> questionsDto, List<string> tagNames, List<Guid> userIds)
     {
-        ValidateInput(surveyDto, questionsDto, tagIds);
+        ValidateInput(surveyDto, questionsDto, tagNames);
 
         var survey = MapSurvey(surveyDto, questionsDto);
 
         await AssignCreatorToSurvey(survey);
-        await AssignTagsToSurvey(survey, tagIds);
+        await AssignTagsToSurvey(survey, tagNames);
         await AssignTopicToSurvey(survey, surveyDto.TopicName);
         await AssignImageToSurvey(survey, surveyDto.Image);
         await AssignUsersToSurvey(survey, userIds);
@@ -53,13 +53,13 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
     }
 
     private void ValidateInput(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto,
-        List<Guid> tagIds)
+        List<string> tagNames)
     {
         if (surveyDto == null)
             throw new Exception("Survey is null");
         if (questionsDto == null || questionsDto.Count == 0)
             throw new Exception("Questions are missing");
-        if (tagIds == null)
+        if (tagNames == null || tagNames.Count == 0)
             throw new Exception("Tags are missing");
     }
 
@@ -73,30 +73,29 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         return survey;
     }
 
-    private async Task AssignTagsToSurvey(Survey survey, List<Guid> tagIds)
+    private async Task AssignTagsToSurvey(Survey survey, List<string> tagNames)
     {
-        var tags = await repositoryManager.Tag.GetAllTags(true)
-            .Where(tag => tagIds.Contains(tag.Id))
+        var existingTags = await repositoryManager.Tag.GetAllTags(true)
+            .Where(tag => tagNames.Contains(tag.Name))
             .ToListAsync();
-
-        foreach (var tag in tags)
-        {
-            survey.Tags.Add(tag);
-        }
+        
+        var newTagNames = tagNames.Except(existingTags.Select(t => t.Name)).ToList();
+        
+        var newTags = newTagNames.Select(tagName => new Tag { Name = tagName }).ToList();
+        existingTags.AddRange(newTags);
+        
+        survey.Tags = existingTags;
     }
 
     private async Task AssignTopicToSurvey(Survey survey, string topicName)
     {
-        var topic = await repositoryManager.Topic.GetAllTopics(false)
+        var topic = await repositoryManager.Topic.GetAllTopics(true)
             .FirstOrDefaultAsync(t => t.Name == topicName);
 
         if (topic == null)
-        {
-            topic = new Topic { Name = topicName };
-            await repositoryManager.Topic.CreateTopicAsync(topic);
-        }
+            throw new Exception();
 
-        survey.TopicId = topic.Id;
+        survey.Topic = topic;
     }
 
     private async Task AssignImageToSurvey(Survey survey, IFormFile? image)
@@ -138,9 +137,7 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
             return surveys.Where(survey => survey.IsPublic);
         }
 
-        var userId = user.Id;
-
         return surveys.Where(survey =>
-            survey.IsPublic || survey.CreatorId == userId || survey.AccessibleUsers.Any(u => u.Id == userId));
+            survey.IsPublic || survey.CreatorId == user.Id || survey.AccessibleUsers.Any(u => u.Id == user.Id));
     }
 }

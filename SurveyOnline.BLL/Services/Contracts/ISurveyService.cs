@@ -5,7 +5,7 @@ namespace SurveyOnline.BLL.Services.Contracts;
 
 public interface ISurveyService
 {
-    Task CreateSurveyAsync(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto, List<Guid> tagIds, List<Guid> userIds);
+    Task CreateSurveyAsync(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto, List<string> tagNames, List<Guid> userIds);
     Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(int countSurvey);
     Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize);
 }

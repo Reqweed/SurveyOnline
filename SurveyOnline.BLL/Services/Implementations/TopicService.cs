@@ -9,11 +9,14 @@ namespace SurveyOnline.BLL.Services.Implementations;
 
 public class TopicService(IRepositoryManager repositoryManager, IMapper mapper) : ITopicService
 {
-    public async Task<IEnumerable<TopicDto>> GetAllTopicsAsync()
+    public async Task<IEnumerable<TopicDto>> GetTopicsByQueryAsync(string query, int countTopic)
     {
-        var topics = await repositoryManager.Topic.GetAllTopics(false).ToListAsync();
-
-        var topicsDto = mapper.Map<IEnumerable<Topic>,IEnumerable<TopicDto>>(topics);
+        var topics = await repositoryManager.Topic.GetAllTopics(false)
+            .Where(topic => topic.Name.ToLower().Contains(query.ToLower()))
+            .Take(countTopic)
+            .ToListAsync();
+        
+        var topicsDto = mapper.Map<IEnumerable<Topic>, IEnumerable<TopicDto>>(topics);
 
         return topicsDto;
     }
