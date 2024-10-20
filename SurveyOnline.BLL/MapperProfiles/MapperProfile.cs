@@ -27,6 +27,12 @@ public class MapperProfile : Profile
 
         CreateMap<Topic, TopicDto>();
         CreateMap<Tag, TagDto>();
+        CreateMap<Tag, TagForCloudDto>()
+            .ConstructUsing(src => new TagForCloudDto(
+                src.Id, 
+                src.Name,
+                src.Surveys.Count)
+            );
 
         CreateMap<SurveyForCreatedDto, Survey>();
         CreateMap<Survey, SurveyDto>()
