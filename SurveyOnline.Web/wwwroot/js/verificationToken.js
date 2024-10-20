@@ -1,0 +1,1 @@
+const getToken = () => document.querySelector('[name="__RequestVerificationToken"]').value;
