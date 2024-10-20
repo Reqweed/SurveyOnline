@@ -12,7 +12,6 @@ namespace SurveyOnline.Web.Pages;
 
 public class SurveyConstructor(IServiceManager serviceManager) : PageModel
 {
-    public Guid UserId => Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
     public IEnumerable<TagDto> Tags { get; private set; }
     public IEnumerable<TopicDto> Topics { get; private set; }
     [BindProperty] public SurveyForCreatedDto Survey { get; set; }
@@ -34,7 +33,7 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
             return Page();
         }
         
-        await serviceManager.Survey.CreateSurveyAsync(UserId, Survey, Questions, SelectedTags, SelectedUsers);
+        await serviceManager.Survey.CreateSurveyAsync(Survey, Questions, SelectedTags, SelectedUsers);
 
         return RedirectToPage(nameof(SurveyConstructor));
     }

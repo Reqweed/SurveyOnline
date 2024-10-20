@@ -14,13 +14,14 @@ namespace SurveyOnline.BLL.Services.Implementations;
 public class SurveyService(SignInManager<User> signInManager, IRepositoryManager repositoryManager,
     ICloudinaryService cloudinaryService, IMapper mapper) : ISurveyService
 {
-    public async Task CreateSurveyAsync(Guid idCreator, SurveyForCreatedDto surveyDto,
+    public async Task CreateSurveyAsync(SurveyForCreatedDto surveyDto,
         List<QuestionForCreatedDto> questionsDto, List<Guid> tagIds, List<Guid> userIds)
     {
         ValidateInput(surveyDto, questionsDto, tagIds);
 
-        var survey = MapSurvey(surveyDto, idCreator, questionsDto);
+        var survey = MapSurvey(surveyDto, questionsDto);
 
+        await AssignCreatorToSurvey(survey);
         await AssignTagsToSurvey(survey, tagIds);
         await AssignTopicToSurvey(survey, surveyDto.TopicName);
         await AssignImageToSurvey(survey, surveyDto.Image);
@@ -30,9 +31,9 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         await repositoryManager.SaveAsync();
     }
 
-    public async Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(Guid idUser, int countSurvey)
+    public async Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(int countSurvey)
     {
-        var surveysTop = await GetAccessibleSurveys(idUser)
+        var surveysTop = await (await GetAccessibleSurveys())
             .OrderByDescending(survey => survey.CompletedCount)
             .Take(countSurvey)
             .ToListAsync();
@@ -40,9 +41,9 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         return mapper.Map<IEnumerable<Survey>, IEnumerable<SurveyDto>>(surveysTop);
     }
 
-    public async Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(Guid idUser, int currentPage, int pageSize)
+    public async Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize)
     {
-        var surveys = await GetAccessibleSurveys(idUser)
+        var surveys = await (await GetAccessibleSurveys())
             .OrderBy(survey => survey.CreatedDate)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
@@ -62,11 +63,10 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
             throw new Exception("Tags are missing");
     }
 
-    private Survey MapSurvey(SurveyForCreatedDto surveyDto, Guid idCreator, List<QuestionForCreatedDto> questionsDto)
+    private Survey MapSurvey(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto)
     {
         var survey = mapper.Map<SurveyForCreatedDto, Survey>(surveyDto);
 
-        survey.CreatorId = idCreator;
         survey.Questions = mapper.Map<List<QuestionForCreatedDto>, List<Question>>(questionsDto);
         survey.CreatedDate = DateTime.UtcNow;
 
@@ -107,6 +107,15 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         }
     }
 
+    private async Task AssignCreatorToSurvey(Survey survey)
+    {
+        var creator = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
+        if (creator is null)
+            throw new Exception();
+
+        survey.Creator = creator;
+    }
+
     private async Task AssignUsersToSurvey(Survey survey, List<Guid>? userIds)
     {
         if (userIds is not null && userIds.Count != 0)
@@ -119,10 +128,19 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         }
     }
 
-    private IQueryable<Survey> GetAccessibleSurveys(Guid idUser)
+    private async Task<IQueryable<Survey>> GetAccessibleSurveys()
     {
-        return repositoryManager.Survey.GetAllSurveys(false)
-            .Where(survey => survey.IsPublic || survey.AccessibleUsers.Any(user => user.Id == idUser)
-                                             || survey.CreatorId == idUser);
+        var user = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
+        var surveys = repositoryManager.Survey.GetAllSurveys(false);
+
+        if (user is null)
+        {
+            return surveys.Where(survey => survey.IsPublic);
+        }
+
+        var userId = user.Id;
+
+        return surveys.Where(survey =>
+            survey.IsPublic || survey.CreatorId == userId || survey.AccessibleUsers.Any(u => u.Id == userId));
     }
 }
