@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SurveyOnline.BLL.Entities.DTOs.User;
@@ -7,16 +8,17 @@ using SurveyOnline.DAL.Entities.Enums;
 
 namespace SurveyOnline.Web.Pages;
 
+[Authorize]
 public class AdminPanel(IServiceManager serviceManager) : PageModel
 {
     [BindProperty] 
     public List<Guid> SelectedUsers { get; set; } = new();
     [BindProperty] 
-    public IEnumerable<UserForManagementDto> Users => serviceManager.User.GetAllUser();
+    public IEnumerable<UserForManagementDto> Users { get; set; }
     
-    public void OnGet()
+    public async Task OnGet()
     {
-
+        Users = await serviceManager.User.GetAllUsersAsync();
     }
     
     public async Task<IActionResult> OnPostBlockAsync()

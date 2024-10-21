@@ -1,45 +1,61 @@
-﻿@using Index = SurveyOnline.Web.Pages.Index
+﻿@using System.Security.Claims
+@using SurveyOnline.DAL.Entities.Enums
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    </head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar with Tabs on the left -->
-        <div class="col-md-3 col-lg-2 bg-light vh-100">
-            <ul class="nav flex-column nav-pills mt-3">
-                @if (!User.Identity.IsAuthenticated)
-                {
+        <nav class="col-md-3 col-lg-2 bg-light vh-100 sticky-top">
+            <div class="d-flex flex-column align-items-start mt-3">
+                <h4 class="mb-4">Navigation</h4>
+                <ul class="nav flex-column nav-pills">
                     <li class="nav-item">
-                        <a class="nav-link" asp-page="@nameof(Login)">Login</a>
+                        <a class="nav-link" asp-page="@nameof(Index)"><i class="fas fa-home"></i> Main</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-page="@nameof(Register)">Registration</a>
-                    </li>
-                }
-                else
-                {
-                    <form method="post" asp-page="@nameof(Index)" asp-page-handler="Logout">
-                        <button type="submit" class="nav-link btn btn-link">Logout</button>
-                    </form>
-                }
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="@nameof(AdminPanel)">Admin Panel</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-page="@nameof(SurveyConstructor)">Survey Constructor</a>
-                </li>
-            </ul>
-        </div>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="@nameof(Login)"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="@nameof(Register)"><i class="fas fa-user-plus"></i> Registration</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <form method="post" asp-page="@nameof(Index)" asp-page-handler="Logout" class="nav-link">
+                                <button type="submit" class="btn btn-link p-0"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                            </form>
+                        </li>
+                    }
+                    @if (User.Identity.IsAuthenticated && User.FindFirst(ClaimTypes.Role)?.Value == RoleType.Admin.ToString())
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="@nameof(AdminPanel)"><i class="fas fa-cog"></i> Admin Panel</a>
+                        </li>
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-page="@nameof(SurveyConstructor)"><i class="fas fa-pencil-alt"></i> Survey Constructor</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </nav>
 
-        <div class="col-md-9 col-lg-10">
+        <main class="col-md-9 col-lg-10">
             <div class="row bg-light py-3">
                 <div class="col-12">
-                    <input type="text" class="form-control" placeholder="Search...">
+                    <input type="text" class="form-control" placeholder="Search..." aria-label="Search">
                 </div>
             </div>
 
@@ -50,7 +66,7 @@
                     </main>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 </div>
 

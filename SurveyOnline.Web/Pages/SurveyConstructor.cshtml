@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" rel="stylesheet">
 </head>
 
-<div class="container">
+<div class="container mt-5">
     <form method="post" enctype="multipart/form-data">
         <div class="card mb-4">
             <div class="card-header">
@@ -19,13 +19,13 @@
             <div class="card-body">
                 <div class="form-group mb-3">
                     <label asp-for="Survey.Title" class="form-label"></label>
-                    <input asp-for="Survey.Title" class="form-control" placeholder="Enter survey title"/>
+                    <input asp-for="Survey.Title" class="form-control" placeholder="Enter survey title" />
                     <span asp-validation-for="Survey.Title" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mb-3">
                     <label asp-for="Survey.Description" class="form-label"></label>
-                    <textarea asp-for="Survey.Description" id="markdown-editor" class="form-control" rows="3" placeholder="Enter description"></textarea>
+                    <textarea asp-for="Survey.Description" id="markdown-editor" class="form-control" rows="5" placeholder="Enter description"></textarea>
                     <span asp-validation-for="Survey.Description" class="text-danger"></span>
                 </div>
 
@@ -35,19 +35,22 @@
                     <span asp-validation-for="Survey.TopicName" class="text-danger"></span>
                 </div>
 
-                <div class="form-group form-check mb-3">
-                    <input asp-for="Survey.IsPublic" class="form-check-input" id="isPublicCheckbox"/>
+                <div class="form-check mb-3">
+                    <input asp-for="Survey.IsPublic" class="form-check-input" id="isPublicCheckbox" />
                     <label asp-for="Survey.IsPublic" class="form-check-label">Is Public</label>
                 </div>
 
-                <div class="form-group mb-3" id="user-select-container" style="display: block;">
-                    <label asp-for="SelectedUsers" class="form-label">Accessible Users</label>
-                    <select asp-for="SelectedUsers" class="form-select" multiple id="SelectedUsers" name="SelectedUsers"></select>
-                </div>
+                @if (!Model.Survey.IsPublic)
+                {
+                    <div class="form-group mb-3" id="user-select-container">
+                        <label asp-for="SelectedUsers" class="form-label">Accessible Users</label>
+                        <select asp-for="SelectedUsers" class="form-select" multiple id="SelectedUsers" name="SelectedUsers"></select>
+                    </div>
+                }
 
                 <div class="form-group mb-3">
                     <label asp-for="Survey.Image" class="form-label"></label>
-                    <input asp-for="Survey.Image" type="file" class="form-control-file" accept=".jpg, .jpeg, .png"/>
+                    <input asp-for="Survey.Image" type="file" class="form-control" accept=".jpg, .jpeg, .png" />
                     <span asp-validation-for="Survey.Image" class="text-danger"></span>
                 </div>
 
@@ -74,13 +77,13 @@
                     {
                         @for (var i = 0; i < Model.Questions.Count; i++)
                         {
-                            <div class="form-group mb-3 question-item card p-3" data-index="@i">
+                            <div class="form-group mb-3 question-item card p-3 border">
                                 <label>Title</label>
-                                <input class="form-control" type="text" asp-for="Questions[i].Title" value="@Model.Questions[i].Title"/>
-
+                                <input class="form-control" type="text" asp-for="Questions[i].Title" value="@Model.Questions[i].Title" />
+                
                                 <label>Description</label>
-                                <input class="form-control" type="text" asp-for="Questions[i].Description" value="@Model.Questions[i].Description"/>
-
+                                <input class="form-control" type="text" asp-for="Questions[i].Description" value="@Model.Questions[i].Description" />
+                
                                 <label>Type</label>
                                 <select class="form-select" asp-for="Questions[i].Type">
                                     @foreach (var type in Enum.GetNames(typeof(QuestionType)))
@@ -88,18 +91,21 @@
                                         <option value="@type" selected="@(type == Model.Questions[i].Type.ToString())">@type</option>
                                     }
                                 </select>
-
-                                <label>Is Visible</label>
-                                <input asp-for="Questions[i].IsVisible" class="form-check-input" type="checkbox" name="Questions[@i].IsVisible"
-                                       checked="@(Model.Questions[i].IsVisible ? "checked" : null)"/>
+                
+                                <div class="form-check">
+                                    <input asp-for="Questions[i].IsVisible" class="form-check-input" type="checkbox" name="Questions[@i].IsVisible" checked="@(Model.Questions[i].IsVisible ? "checked" : null)" />
+                                    <label class="form-check-label">Is Visible</label>
+                                </div>
                                 <button type="submit" class="btn btn-danger mt-2 remove-question" asp-page-handler="RemoveQuestion" name="questionIndex" value="@i">Remove Question</button>
                             </div>
                         }
                     }
                 </div>
 
-                <button type="submit" class="btn btn-success" asp-page-handler="SubmitForm">Submit</button>
-                <button type="submit" class="btn btn-primary mb-3" asp-page-handler="AddQuestion">Add Question</button>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-success" asp-page-handler="SubmitForm">Submit</button>
+                    <button type="submit" class="btn btn-primary" asp-page-handler="AddQuestion">Add Question</button>
+                </div>
             </div>
         </div>
     </form>
@@ -113,82 +119,113 @@
     <script src="js/markdown-editor.js"></script>
     <script src="js/verificationToken.js"></script>
     <script>
-       $(document).ready(function() {
-                   $('.tags-select').select2({
-                       tags: true,
-                       tokenSeparators: [',', ' '],
-                       placeholder: 'Select tags'
-                   });
-       
-                   $('#isPublicCheckbox').on('change', function() {
-                       const userSelectContainer = $('#user-select-container');
-                       userSelectContainer.toggle(!this.checked);
-                       if (!this.checked) initializeUserSelect();
-                   });
-       
-                   async function initializeUserSelect() {
-                       const userSelect = $('#SelectedUsers');
-                       userSelect.select2({
-                           placeholder: 'Select users',
-                           tokenSeparators: [',', ' '],
-                           minimumInputLength: 1,
-                           ajax: {
-                               url: '@Url.Page(nameof(SurveyConstructor))?handler=SearchUsers',
-                               type: 'POST',
-                               headers: {
-                                   'RequestVerificationToken': getToken()
-                               },
-                               contentType: 'application/json',
-                               dataType: 'json',
-                               data: function (params) {
-                                  const query = params.term;
-                                  return  JSON.stringify(query);
-                               },
-                               processResults: function(data) {
-                                   return {
-                                       results: data.map(user => ({
-                                           id: user.id,
-                                           text: `${user.userName} - ${user.email}`
-                                       }))
-                                   };
-                               },
-                               cache: true
-                           }
-                       });
-                   }
-                   
-                   async function initializeTopicSelect() {
-                      const topicSelect = $('#Topic');
-                      topicSelect.select2({
-                          placeholder: 'Enter topic',
-                          minimumInputLength: 1,
-                          ajax: {
-                              url: '@Url.Page(nameof(SurveyConstructor))?handler=SearchTopic',
-                              type: 'POST',
-                              headers: {
-                                  'RequestVerificationToken': getToken()
-                              },
-                              contentType: 'application/json',
-                              dataType: 'json',
-                              data: function (params) {
-                                 const query = params.term;
-                                 return  JSON.stringify(query);
-                              },
-                              processResults: function(data) {
-                                  return {
-                                      results: data.map(topic => ({
-                                          id: `${topic.name}`,
-                                          text: `${topic.name}`
-                                      }))
-                                  };
-                              },
-                              cache: true
-                          }
-                      });
-                  }
-                  
-                  initializeTopicSelect();
-                  initializeUserSelect();
-               });
+        $(document).ready(function() {
+            const questionsContainer = document.getElementById('questions-container');
+            Sortable.create(questionsContainer, {
+                animation: 150,
+                handle: '.question-item',
+                onEnd: function () {
+                    updateQuestionIndices();
+                    updateHiddenIndices();
+                }
+            });
+
+            function updateQuestionIndices() {
+                const questionItems = document.querySelectorAll('.question-item');
+                questionItems.forEach((element, index) => {
+                    element.setAttribute('data-index', index);
+                });
+            }
+            
+            function updateHiddenIndices() {
+                const questionItems = document.querySelectorAll('.question-item');
+                questionItems.forEach((element, index) => {
+                    element.setAttribute('data-index', index);
+                    
+                    const inputs = element.querySelectorAll('input[name^="Questions["], select[name^="Questions["]');
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        const newName = name.replace(/Questions\[\d+]/, `Questions[${index}]`);
+                        input.setAttribute('name', newName);
+                    });
+                });
+            }
+
+            $('.tags-select').select2({
+                tags: true,
+                tokenSeparators: [',', ' '],
+                placeholder: 'Select tags'
+            });
+
+            $('#isPublicCheckbox').on('change', function() {
+                const userSelectContainer = $('#user-select-container');
+                userSelectContainer.toggle(!this.checked);
+                if (!this.checked) initializeUserSelect();
+            });
+
+            async function initializeUserSelect() {
+                const userSelect = $('#SelectedUsers');
+                userSelect.select2({
+                    placeholder: 'Select users',
+                    tokenSeparators: [',', ' '],
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: '@Url.Page(nameof(SurveyConstructor))?handler=SearchUsers',
+                        type: 'POST',
+                        headers: {
+                            'RequestVerificationToken': getToken()
+                        },
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: function (params) {
+                            const query = params.term;
+                            return JSON.stringify(query);
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(user => ({
+                                    id: user.id,
+                                    text: `${user.userName} - ${user.email}`
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+            async function initializeTopicSelect() {
+                const topicSelect = $('#Topic');
+                topicSelect.select2({
+                    placeholder: 'Enter topic',
+                    minimumInputLength: 1,
+                    ajax: {
+                        url: '@Url.Page(nameof(SurveyConstructor))?handler=SearchTopic',
+                        type: 'POST',
+                        headers: {
+                            'RequestVerificationToken': getToken()
+                        },
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: function (params) {
+                            const query = params.term;
+                            return JSON.stringify(query);
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.map(topic => ({
+                                    id: `${topic.name}`,
+                                    text: `${topic.name}`
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+            }
+
+            initializeTopicSelect();
+            initializeUserSelect();
+        });
     </script>
 }

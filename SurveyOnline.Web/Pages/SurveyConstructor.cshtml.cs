@@ -11,7 +11,7 @@ namespace SurveyOnline.Web.Pages;
 public class SurveyConstructor(IServiceManager serviceManager) : PageModel
 {
     public IEnumerable<TagDto> Tags { get; private set; } = serviceManager.Tag.GetAllTagsAsync().Result;
-    [BindProperty] public SurveyForCreatedDto Survey { get; set; }
+    [BindProperty] public SurveyForCreatedDto Survey { get; set; } = new();
 
     [BindProperty]
     public List<QuestionForCreatedDto> Questions { get; set; } = new()
@@ -65,8 +65,8 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
         {
             Questions.RemoveAt(questionIndex);
         }
-
         ModelState.Clear();
+        
         return Page();
     }
 

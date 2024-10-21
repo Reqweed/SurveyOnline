@@ -2,163 +2,156 @@
 @using System.Text.Json
 @using Markdig
 @model Index
+
 @{
     var jsonTags = JsonSerializer.Serialize(Model.Tags);
 }
 
 <head>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet"/>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"/>
-    <style>
-        .survey-description {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 
 <body>
-<div class="container text-center mt-3">
-    <div class="word-cloud-container">
-        <div class="card w-50 mx-auto border-0">
-            <div class="card-body">
-                <div id="word-cloud-html" style="width: 100%; height: 200px;"></div>
+    <div class="container text-center mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+                        <div id="word-cloud-html" class="word-cloud w-100" style="height: 200px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="container my-5">
-    <h3 class="text-center mb-4">Top 5</h3>
-    <div class="row">
-        @foreach (var survey in Model.SurveysTop)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-body d-flex flex-column" style="height: 400px;">
-                        <h5 class="card-title">@survey.Title</h5>
-                        @if (survey.UrlImage is null)
-                        {
-                            <div class="d-flex align-items-center justify-content-center bg-light text-secondary flex-grow-1">
-                                No image
+    <div class="container my-5">
+        <h3 class="text-center mb-4">Top 5 Surveys</h3>
+        <div class="row g-4">
+            @foreach (var survey in Model.SurveysTop)
+            {
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@survey.Title</h5>
+                            @if (survey.UrlImage is null)
+                            {
+                                <div class="d-flex align-items-center justify-content-center bg-light text-secondary flex-grow-1">
+                                    <i class="fas fa-image fa-5x"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <img src="@survey.UrlImage" class="img-fluid mb-3" style="max-height: 15vw; object-fit: contain;" alt="Survey image" />
+                            }
+                            <div class="flex-grow-1">
+                                <p class="card-text">@Html.Raw(Markdown.ToHtml(survey.Description))</p>
                             </div>
-                        }
-                        else
-                        {
-                            <img src="@survey.UrlImage" class="img-fluid" style="max-height: 150px; object-fit: contain;" alt="@survey.Title"/>
-                        }
-                        <div class="flex-grow-1">
-                            <div class="survey-description">
-                                @Html.Raw(Markdown.ToHtml(survey.Description))
-                            </div>
+                            <p class="card-text">
+                                <small class="text-muted">Author: @survey.AuthorName</small>
+                            </p>
+                            <a href="@nameof(PassingSurvey)?id=@survey.Id" class="btn btn-primary mt-auto">Go to survey</a>
                         </div>
-                        <p class="card-text">
-                            <small class="text-muted">Author: @survey.AuthorName</small>
-                        </p>
-                        <a href="@nameof(Index)/@survey.Id" class="btn btn-primary">Go to survey</a>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
-</div>
 
-<div class="container my-5 table__container">
-    <h3 class="text-center mb-4">Last Surveys</h3>
-    <div class="row survey-blocks"></div>
-</div>
+    <div class="container my-5">
+        <h3 class="text-center mb-4">Last Surveys</h3>
+        <div class="row g-4 survey-blocks"></div>
+    </div>
 
-@Html.AntiForgeryToken()
+    @Html.AntiForgeryToken()
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.0.6/wordcloud2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="js/verificationToken.js"></script>
-<script>
-    let page = 1;
-    let isLoading = false;
-    const surveyContainer = document.querySelector('.survey-blocks');
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.0.6/wordcloud2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/verificationToken.js"></script>
+    <script>
+        let page = 1;
+        let isLoading = false;
+        const surveyContainer = document.querySelector('.survey-blocks');
 
-    const createHtmlFromMarkdown = (markdownString) => marked.parse(markdownString);
+        const createHtmlFromMarkdown = (markdownString) => marked.parse(markdownString);
 
-    const createSurveyBlock = (item) => `
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body d-flex flex-column" style="height: 400px;">
-                    <h5 class="card-title">${item.title}</h5>
-                    ${item.urlImage ? 
-                        `<img src="${item.urlImage}" class="img-fluid" style="max-height: 150px; object-fit: contain;" alt="${item.title}"/>` : 
-                        `<div class="d-flex align-items-center justify-content-center bg-light text-secondary flex-grow-1">No Image</div>`}
-                    <div class="flex-grow-1">
-                        <div class="survey-description text-truncate">
-                            ${createHtmlFromMarkdown(item.description)}
+        const createSurveyBlock = (item) => `
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">${item.title}</h5>
+                        ${item.urlImage ? 
+                            `<img src="${item.urlImage}" class="img-fluid mb-3" style="max-height: 15vw; object-fit: contain;" alt="${item.title}"/>` : 
+                            `<div class="d-flex align-items-center justify-content-center bg-light text-secondary flex-grow-1">
+                                <i class="fas fa-image fa-5x"></i>
+                            </div>`}
+                        <div class="flex-grow-1">
+                            <p class="card-text">${createHtmlFromMarkdown(item.description)}</p>
                         </div>
+                        <p class="card-text"><small class="text-muted">Author: ${item.authorName}</small></p>
+                        <a href="@nameof(PassingSurvey)?id=${item.id}" class="btn btn-primary mt-auto">Go to survey</a>
                     </div>
-                    <p class="card-text"><small class="text-muted">Author: ${item.authorName}</small></p>
-                    <a href="@nameof(Index)/${item.id}" class="btn btn-primary">Go to survey</a>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
 
-    const addSurveyBlocks = (data) => {
-        const blocks = data.map(createSurveyBlock).join('');
-        surveyContainer.insertAdjacentHTML('beforeend', blocks);
-    };
+        const addSurveyBlocks = (data) => {
+            const blocks = data.map(createSurveyBlock).join('');
+            surveyContainer.insertAdjacentHTML('beforeend', blocks);
+        };
 
-    const fetchData = async () => {
-        if (isLoading) return;
-        isLoading = true;
+        const fetchData = async () => {
+            if (isLoading) return;
+            isLoading = true;
 
-        const response = await fetch('@Url.Page(nameof(Index))?handler=LoadSurveys', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'RequestVerificationToken': getToken()
-            },
-            body: JSON.stringify(page)
-        });
+            const response = await fetch('@Url.Page(nameof(Index))?handler=LoadSurveys', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': getToken()
+                },
+                body: JSON.stringify(page)
+            });
 
-        const data = await response.json();
-        addSurveyBlocks(data);
-        page++;
-        isLoading = false;
-    };
+            const data = await response.json();
+            addSurveyBlocks(data);
+            page++;
+            isLoading = false;
+        };
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10) {
-            fetchData();
-        }
-    });
-
-    const drawWordCloud = () => {
-        const tags = JSON.parse('@Html.Raw(jsonTags)').map(tag => [tag.Name, Math.min(Math.max(tag.Count, 15), 40)]);
-
-        WordCloud(document.getElementById('word-cloud-html'), {
-            list: tags,
-            gridSize: 10,
-            weightFactor: 1.5,
-            color: 'random-dark',
-            shape: "circle",
-            ellipticity: 0.8,
-            shrinkToFit: true,
-            click: async (item) => {
-                const response = await fetch('@Url.Page(nameof(Index))?handler=SelectedTag', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': getToken()
-                    },
-                    body: JSON.stringify({ 'selectedTag': item[0] })
-                });
-                const data = await response.json();
-                window.location.href = data;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10) {
+                fetchData();
             }
         });
-    };
 
-    fetchData();
-    drawWordCloud();
-</script>
+        const drawWordCloud = () => {
+            const tags = JSON.parse('@Html.Raw(jsonTags)').map(tag => [tag.Name, Math.min(Math.max(tag.Count, 15), 40)]);
+
+            WordCloud(document.getElementById('word-cloud-html'), {
+                list: tags,
+                gridSize: 10,
+                weightFactor: 1.5,
+                color: 'random-dark',
+                shape: "circle",
+                ellipticity: 0.8,
+                shrinkToFit: true,
+                click: async (item) => {
+                    const response = await fetch('@Url.Page(nameof(Index))?handler=SelectedTag', {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': getToken()
+                        },
+                        body: JSON.stringify({ 'selectedTag': item[0] })
+                    });
+                    const data = await response.json();
+                    window.location.href = data;
+                }
+            });
+        };
+
+        fetchData();
+        drawWordCloud();
+    </script>
 </body>
