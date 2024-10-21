@@ -1,0 +1,97 @@
+@page
+@using SurveyOnline.DAL.Entities.Enums
+@using Markdig
+@model PassingSurvey
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-4">@Model.Survey.Title</h1>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Survey.UrlImage))
+    {
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 col-md-10 col-12 text-center">
+                <img src="@Model.Survey.UrlImage" class="img-fluid mb-4 rounded shadow" style="max-height: 20vw; object-fit: contain;" alt="Survey Image" />
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-8 col-md-10 col-12 text-center">
+                <i class="fas fa-image fa-5x"></i>
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <p class="lead">@Html.Raw(Markdown.ToHtml(Model.Survey.Description))</p>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-6 col-md-12 mb-3">
+            <h5>Topic: <span class="badge bg-info">@Model.Survey.TopicName</span></h5>
+        </div>
+        <div class="col-lg-6 col-md-12">
+            <div class="d-flex flex-wrap">
+                <h5>Tags:
+                @foreach (var tag in Model.Survey.Tags)
+                {
+                    <span class="badge bg-secondary me-2 mb-2">@tag.Name</span>
+                }
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Questions</h2>
+            <form method="post">
+                @for (var i = 0; i < Model.Survey.Questions.Count; i++)
+                {
+                    var question = Model.Survey.Questions[i];
+                    <div class="mb-4 p-4 rounded shadow-sm bg-light border">
+                        <label class="form-label fw-bold">@($"{i + 1}. {question.Title}")</label>
+
+                        @switch (question.Type)
+                        {
+                            case QuestionType.SingleLine:
+                                <input type="text" class="form-control" name="Answers[@i]" placeholder="@question.Description" required />
+                                break;
+
+                            case QuestionType.MultiLine:
+                                <textarea class="form-control" name="Answers[@i]" rows="3" placeholder="@question.Description" required></textarea>
+                                break;
+
+                            case QuestionType.Integer:
+                                <input type="number" class="form-control" name="Answers[@i]" placeholder="@question.Description" required />
+                                break;
+
+                            case QuestionType.CheckBox:
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" name="Answers[@i]" id="question_@i" />
+                                    <label class="form-check-label" for="question_@i">@question.Description</label>
+                                </div>
+                                break;
+                        }
+                        
+                        <input type="hidden" asp-for="Survey.Id" value="@Model.Survey.Id" />
+                        <input type="hidden" asp-for="Survey.Questions[i].Id" value="@question.Id" />
+                        <input type="hidden" asp-for="Survey.Questions[i].Title" value="@question.Title" />
+                        <input type="hidden" asp-for="Survey.Questions[i].Type" value="@question.Type" />
+                    </div>
+                }
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
