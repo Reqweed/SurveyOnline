@@ -50,9 +50,4 @@ public class PostgresDbContext
         modelBuilder.Entity<Tag>().HasData(DataInitializer.Tags);
         modelBuilder.Entity<Topic>().HasData(DataInitializer.Topics);
     }
-    
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseLazyLoadingProxies();
-    }
 }

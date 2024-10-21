@@ -11,5 +11,5 @@ public class Question
     public bool IsVisible { get; set; }
 
     public Guid SurveyId { get; set; }
-    public virtual Survey Survey { get; set; }
+    public Survey Survey { get; set; }
 }

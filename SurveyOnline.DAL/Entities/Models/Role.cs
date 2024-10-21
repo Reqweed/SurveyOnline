@@ -4,5 +4,5 @@ namespace SurveyOnline.DAL.Entities.Models;
 
 public class Role : IdentityRole<Guid>
 {
-    public virtual ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; }
 }
