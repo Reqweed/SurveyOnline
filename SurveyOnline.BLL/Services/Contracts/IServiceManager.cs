@@ -7,5 +7,6 @@ public interface IServiceManager
     IUserService User { get; }
     ITopicService Topic { get; }
     ISurveyService Survey { get; }
+    ICompletedSurveyService CompletedSurvey { get; }
     ITagService Tag { get; }
 }

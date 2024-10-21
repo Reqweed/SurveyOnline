@@ -8,4 +8,5 @@ public interface ISurveyService
     Task CreateSurveyAsync(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto, List<string> tagNames, List<Guid> userIds);
     Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(int countSurvey);
     Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize);
+    Task<SurveyForCompletedDto> GetSurveyAsync(Guid idSurvey);
 }

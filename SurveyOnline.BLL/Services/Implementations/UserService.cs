@@ -12,7 +12,10 @@ public class UserService(SignInManager<User> signInManager, IMapper mapper) : IU
 {
     public async Task<IEnumerable<UserForManagementDto>> GetAllUsersAsync()
     {
-        var users = await signInManager.UserManager.Users.ToListAsync();
+        var users = await signInManager.UserManager.Users
+            .Include(u => u.UserRoles)
+            .ThenInclude(ur => ur.Role)
+            .ToListAsync();
         
         var usersDto = mapper.Map<IEnumerable<User>, IEnumerable<UserForManagementDto>>(users);
         
@@ -23,9 +26,10 @@ public class UserService(SignInManager<User> signInManager, IMapper mapper) : IU
     {
         var queryLower = query.ToLower();
         var users = await signInManager.UserManager.Users.
-            Where(user => user.Email.ToLower().Contains(queryLower) 
-                          || user.UserName.ToLower().Contains(queryLower))
-            .Take(usersCount).ToListAsync();
+            Where(u => u.Email.ToLower().Contains(queryLower) 
+                          || u.UserName.ToLower().Contains(queryLower))
+            .Take(usersCount)
+            .ToListAsync();
         
         var usersDto = mapper.Map<IEnumerable<User>, IEnumerable<UserForSearchingDto>>(users);
         

@@ -36,6 +36,7 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         var surveysTop = await (await GetAccessibleSurveys())
             .OrderByDescending(survey => survey.CompletedCount)
             .Take(countSurvey)
+            .Include(survey => survey.Creator)
             .ToListAsync();
 
         return mapper.Map<IEnumerable<Survey>, IEnumerable<SurveyDto>>(surveysTop);
@@ -47,9 +48,27 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
             .OrderBy(survey => survey.CreatedDate)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
+            .Include(survey => survey.Creator)
             .ToListAsync();
 
         return mapper.Map<IEnumerable<Survey>, IEnumerable<SurveyDto>>(surveys);
+    }
+
+    public async Task<SurveyForCompletedDto> GetSurveyAsync(Guid idSurvey)
+    {
+        var survey = await (await GetAccessibleSurveys())
+            .Where(survey => survey.Id == idSurvey)
+            .Include(survey => survey.Creator)
+            .Include(survey => survey.Questions)
+            .Include(survey => survey.Topic)
+            .Include(survey => survey.Tags)
+            .FirstOrDefaultAsync();
+        if (survey is null)
+            throw new Exception();
+
+        var surveyDto = mapper.Map<Survey, SurveyForCompletedDto>(survey);
+
+        return surveyDto;
     }
 
     private void ValidateInput(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto,
@@ -78,12 +97,12 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         var existingTags = await repositoryManager.Tag.GetAllTags(true)
             .Where(tag => tagNames.Contains(tag.Name))
             .ToListAsync();
-        
+
         var newTagNames = tagNames.Except(existingTags.Select(t => t.Name)).ToList();
-        
+
         var newTags = newTagNames.Select(tagName => new Tag { Name = tagName }).ToList();
         existingTags.AddRange(newTags);
-        
+
         survey.Tags = existingTags;
     }
 

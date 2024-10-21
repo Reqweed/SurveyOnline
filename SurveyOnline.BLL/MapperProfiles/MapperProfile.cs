@@ -18,32 +18,45 @@ public class MapperProfile : Profile
         CreateMap<User, UserForSearchingDto>();
         CreateMap<User, UserForManagementDto>()
             .ConstructUsing(src => new UserForManagementDto(
-                src.Id, 
-                src.UserName, 
+                src.Id,
+                src.UserName,
                 src.Email,
                 src.UserRoles.First().Role.Name,
                 src.LockoutEnd > DateTimeOffset.UtcNow ? Status.Block : Status.Unblock)
             );
 
         CreateMap<Topic, TopicDto>();
+
         CreateMap<Tag, TagDto>();
         CreateMap<Tag, TagForCloudDto>()
             .ConstructUsing(src => new TagForCloudDto(
-                src.Id, 
+                src.Id,
                 src.Name,
-                src.Surveys.Count)
+                src.UsageCount)
             );
 
         CreateMap<SurveyForCreatedDto, Survey>();
         CreateMap<Survey, SurveyDto>()
             .ConstructUsing(src => new SurveyDto(
-                src.Id, 
+                src.Id,
                 src.Title,
                 src.UrlImage,
                 src.Description,
                 src.Creator.UserName)
             );
-        
+        CreateMap<Survey, SurveyForCompletedDto>()
+            .ConstructUsing((src, context) => new SurveyForCompletedDto(
+                src.Id,
+                src.Title,
+                src.Description,
+                src.UrlImage,
+                src.Topic.Name,
+                src.Creator.UserName,
+                context.Mapper.Map<List<QuestionDto>>(src.Questions),
+                context.Mapper.Map<List<TagDto>>(src.Tags))
+            );
+
         CreateMap<QuestionForCreatedDto, Question>();
+        CreateMap<Question, QuestionDto>();
     }
 }
