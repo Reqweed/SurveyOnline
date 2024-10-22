@@ -64,7 +64,7 @@
                     <select class="form-select tags-select" name="SelectedTags" multiple="multiple">
                         @foreach (var tag in Model.Tags)
                         {
-                            <option value="@tag.Name">@tag.Name</option>
+                            <option value="@tag.Name" selected="@Model.SelectedTags.Contains(tag.Name)">@tag.Name</option>
                         }
                     </select>
                     <span asp-validation-for="SelectedTags" class="text-danger"></span>
