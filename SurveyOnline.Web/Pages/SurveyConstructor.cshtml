@@ -28,10 +28,15 @@
                     <textarea asp-for="Survey.Description" id="markdown-editor" class="form-control" rows="5" placeholder="Enter description"></textarea>
                     <span asp-validation-for="Survey.Description" class="text-danger"></span>
                 </div>
-
+                
                 <div class="form-group mb-3">
                     <label asp-for="Survey.TopicName" class="form-label"></label>
-                    <select asp-for="Survey.TopicName" class="form-select" id="Topic"></select>
+                    <select asp-for="Survey.TopicName" class="form-select">
+                        @foreach (var topic in Model.Topics)
+                        {
+                            <option value="@topic.Name">@topic.Name</option>
+                        }
+                    </select>
                     <span asp-validation-for="Survey.TopicName" class="text-danger"></span>
                 </div>
 
@@ -148,6 +153,11 @@
                         const newName = name.replace(/Questions\[\d+]/, `Questions[${index}]`);
                         input.setAttribute('name', newName);
                     });
+            
+                    const removeButton = element.querySelector('.remove-question');
+                    if (removeButton) {
+                        removeButton.setAttribute('value', index);
+                    }
                 });
             }
 
@@ -194,37 +204,6 @@
                 });
             }
 
-            async function initializeTopicSelect() {
-                const topicSelect = $('#Topic');
-                topicSelect.select2({
-                    placeholder: 'Enter topic',
-                    minimumInputLength: 1,
-                    ajax: {
-                        url: '@Url.Page(nameof(SurveyConstructor))?handler=SearchTopic',
-                        type: 'POST',
-                        headers: {
-                            'RequestVerificationToken': getToken()
-                        },
-                        contentType: 'application/json',
-                        dataType: 'json',
-                        data: function (params) {
-                            const query = params.term;
-                            return JSON.stringify(query);
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: data.map(topic => ({
-                                    id: `${topic.name}`,
-                                    text: `${topic.name}`
-                                }))
-                            };
-                        },
-                        cache: true
-                    }
-                });
-            }
-
-            initializeTopicSelect();
             initializeUserSelect();
         });
     </script>

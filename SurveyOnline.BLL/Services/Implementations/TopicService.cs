@@ -9,11 +9,9 @@ namespace SurveyOnline.BLL.Services.Implementations;
 
 public class TopicService(IRepositoryManager repositoryManager, IMapper mapper) : ITopicService
 {
-    public async Task<IEnumerable<TopicDto>> GetTopicsByQueryAsync(string query, int countTopic)
+    public async Task<IEnumerable<TopicDto>> GetTopicsAsync()
     {
         var topics = await repositoryManager.Topic.GetAllTopics(false)
-            .Where(topic => topic.Name.ToLower().Contains(query.ToLower()))
-            .Take(countTopic)
             .ToListAsync();
         
         var topicsDto = mapper.Map<IEnumerable<Topic>, IEnumerable<TopicDto>>(topics);

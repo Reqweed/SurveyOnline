@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using SurveyOnline.BLL.Entities.DTOs.Question;
 using SurveyOnline.BLL.Entities.DTOs.Survey;
 using SurveyOnline.BLL.Entities.DTOs.Tag;
+using SurveyOnline.BLL.Entities.DTOs.Topic;
 using SurveyOnline.BLL.Services.Contracts;
 using SurveyOnline.DAL.Entities.Enums;
 
@@ -11,8 +12,9 @@ namespace SurveyOnline.Web.Pages;
 public class SurveyConstructor(IServiceManager serviceManager) : PageModel
 {
     public IEnumerable<TagDto> Tags { get; private set; } = serviceManager.Tag.GetAllTagsAsync().Result;
+    public IEnumerable<TopicDto> Topics { get; private set; } = serviceManager.Topic.GetTopicsAsync().Result;
     [BindProperty] public SurveyForCreatedDto Survey { get; set; } = new();
-
+    
     [BindProperty]
     public List<QuestionForCreatedDto> Questions { get; set; } = new()
     {
@@ -48,7 +50,7 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
 
         await serviceManager.Survey.CreateSurveyAsync(Survey, Questions, SelectedTags, SelectedUsers);
 
-        return RedirectToPage(nameof(SurveyConstructor));
+        return RedirectToPage(nameof(Index));
     }
 
     public IActionResult OnPostAddQuestion()
@@ -76,14 +78,6 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
         var users = await serviceManager.User.GetUsersByQueryAsync(query, 10);
 
         return new JsonResult(users);
-    }
-    
-    [ValidateAntiForgeryToken]
-    public async Task<JsonResult> OnPostSearchTopicAsync([FromBody] string query)
-    {
-        var topics = await serviceManager.Topic.GetTopicsByQueryAsync(query, 5);
-
-        return new JsonResult(topics);
     }
 
     private bool IsValidQuestionIndex(int index)
