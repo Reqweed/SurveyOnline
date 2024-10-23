@@ -8,6 +8,19 @@
 <head>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-5-theme/1.3.0/select2-bootstrap-5-theme.min.css" />
+    <style>
+        html[data-bs-theme="dark"] .select2-selection__choice__display,
+        html[data-bs-theme="dark"] .select2-results__option,
+        html[data-bs-theme="dark"] .select2-selection,
+        html[data-bs-theme="dark"] .CodeMirror{
+            background-color: #212529;
+            color: #dee2e6;
+        }
+        html[data-bs-theme="dark"] .editor-preview {
+            background: #212529;
+        }
+    </style>
 </head>
 
 <div class="container mt-5">
@@ -47,9 +60,9 @@
 
                 @if (!Model.Survey.IsPublic)
                 {
-                    <div class="form-group mb-3" id="user-select-container">
+                    <div class="form-group mb-3" id="select-users-container">
                         <label asp-for="SelectedUsers" class="form-label">Accessible Users</label>
-                        <select asp-for="SelectedUsers" class="form-select" multiple id="SelectedUsers" name="SelectedUsers"></select>
+                        <select asp-for="SelectedUsers" class="form-select" id="selectedUsers" name="SelectedUsers" multiple></select>
                     </div>
                 }
 
@@ -162,20 +175,22 @@
             }
 
             $('.tags-select').select2({
+                theme: 'bootstrap-5',
                 tags: true,
                 tokenSeparators: [',', ' '],
                 placeholder: 'Select tags'
             });
 
             $('#isPublicCheckbox').on('change', function() {
-                const userSelectContainer = $('#user-select-container');
+                const userSelectContainer = $('#select-users-container');
                 userSelectContainer.toggle(!this.checked);
                 if (!this.checked) initializeUserSelect();
             });
 
             async function initializeUserSelect() {
-                const userSelect = $('#SelectedUsers');
+                const userSelect = $('#selectedUsers');
                 userSelect.select2({
+                    theme: 'bootstrap-5',
                     placeholder: 'Select users',
                     tokenSeparators: [',', ' '],
                     minimumInputLength: 1,
@@ -203,7 +218,7 @@
                     }
                 });
             }
-
+           
             initializeUserSelect();
         });
     </script>
