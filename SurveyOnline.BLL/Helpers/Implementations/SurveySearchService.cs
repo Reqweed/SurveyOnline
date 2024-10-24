@@ -8,6 +8,11 @@ public class SurveySearchService(ElasticsearchClient client) : ISurveySearchServ
 {
     private const string Index = "survey";
     
+    public async Task DeleteIndexAsync()
+    { 
+        await client.Indices.DeleteAsync(Index);
+    }
+    
     public async Task AddIndexAsync(SurveyForIndexDto surveyDto)
     {
         if (surveyDto == null)

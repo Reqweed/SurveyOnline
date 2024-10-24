@@ -12,6 +12,7 @@ builder.Services.AddServiceManger();
 builder.Services.AddHelpers();
 builder.Services.AddMiddlewares();
 builder.Services.AddElasticSearch();
+builder.Services.AddDbInitializer();
 
 var app = builder.Build();
 
@@ -30,5 +31,7 @@ app.UseAuthorization();
 app.UseMiddleware<CheckUserLockoutMiddleware>();
 
 app.MapRazorPages();
+
+await app.MigrateDatabaseAndInitializeDataAsync();
 
 app.Run();

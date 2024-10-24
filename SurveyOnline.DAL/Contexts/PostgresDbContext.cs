@@ -45,9 +45,5 @@ public class PostgresDbContext
         modelBuilder.Entity<Survey>()
             .HasMany(s => s.Tags)
             .WithMany(t => t.Surveys);
-
-        modelBuilder.Entity<Role>().HasData(DataInitializer.Roles);
-        modelBuilder.Entity<Tag>().HasData(DataInitializer.Tags);
-        modelBuilder.Entity<Topic>().HasData(DataInitializer.Topics);
     }
 }

@@ -7,4 +7,5 @@ public interface ISurveySearchService
     Task AddIndexAsync(SurveyForIndexDto surveyDto);
     Task<IEnumerable<SurveyForIndexDto>> SearchSurveyByTagAsync(string tagName);
     Task<IEnumerable<SurveyForIndexDto>> SearchSurveysAsync(string searchTerm);
+    Task DeleteIndexAsync();
 }

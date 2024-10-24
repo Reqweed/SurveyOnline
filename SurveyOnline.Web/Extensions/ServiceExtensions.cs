@@ -7,6 +7,8 @@ using SurveyOnline.BLL.Services.Contracts;
 using SurveyOnline.BLL.Services.Implementations;
 using SurveyOnline.DAL.Contexts;
 using SurveyOnline.DAL.Entities.Models;
+using SurveyOnline.DAL.Initializers.Contracts;
+using SurveyOnline.DAL.Initializers.Implementations;
 using SurveyOnline.DAL.Repositories.Contracts;
 using SurveyOnline.DAL.Repositories.Implementations;
 using SurveyOnline.DAL.Triggers;
@@ -20,7 +22,7 @@ public static class ServiceExtensions
 {
     public static void AddContext(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DbConnection");
+        var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
         
         serviceCollection.AddDbContext<PostgresDbContext>(options =>
         {
@@ -79,11 +81,13 @@ public static class ServiceExtensions
 
     public static void AddElasticSearch(this IServiceCollection serviceCollection)
     {
+        var apiKey = Environment.GetEnvironmentVariable("ELASTIC_API_KEY");
+        var url = Environment.GetEnvironmentVariable("ELASTIC_URL");
         var settings =
             new ElasticsearchClientSettings(
-                    new Uri("https://2f34029957a2482981e6bef1ee51361b.us-central1.gcp.cloud.es.io:443"))
+                    new Uri(url))
                 .DefaultIndex("survey")
-                .Authentication(new ApiKey("aTc2a3VaSUI2dUVxVFpvRlBIVEM6WTlEWnJhTm5RU2lFRFBtWEtGNmc0QQ=="))
+                .Authentication(new ApiKey(apiKey))
                 .EnableDebugMode()
                 .PrettyJson()
                 .DisableDirectStreaming();
@@ -91,5 +95,10 @@ public static class ServiceExtensions
         var client = new ElasticsearchClient(settings);
         
         serviceCollection.AddSingleton<ISurveySearchService>(new SurveySearchService(client));
+    }
+
+    public static void AddDbInitializer(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IDbInitializer, DbInitializer>();
     }
 }
