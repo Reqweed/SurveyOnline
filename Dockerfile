@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app 
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["SurveyOnline.Web/SurveyOnline.Web", "SurveyOnline.Web/"]
+COPY ["SurveyOnline.Web/SurveyOnline.Web.csproj", "SurveyOnline.Web/"]
 RUN dotnet restore "SurveyOnline.Web/SurveyOnline.Web.csproj"
 COPY . . 
 WORKDIR "/src/SurveyOnline.Web"
