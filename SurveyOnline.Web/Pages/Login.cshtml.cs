@@ -17,8 +17,13 @@ public class Login(IServiceManager serviceManager) : PageModel
     
     public async Task<IActionResult> OnPost()
     {
-       await serviceManager.Authentication.LoginAsync(User);
+        if (ModelState.IsValid)
+        { 
+            await serviceManager.Authentication.LoginAsync(User);
+    
+            return RedirectToPage(nameof(Index));
+        }
 
-       return RedirectToPage(nameof(Index));
+        return Page();
     }
 }

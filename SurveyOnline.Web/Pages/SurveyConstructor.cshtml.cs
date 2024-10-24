@@ -13,7 +13,8 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
 {
     public IEnumerable<TagDto> Tags { get; private set; } = serviceManager.Tag.GetAllTagsAsync().Result;
     public IEnumerable<TopicDto> Topics { get; private set; } = serviceManager.Topic.GetTopicsAsync().Result;
-    [BindProperty] public SurveyForCreatedDto Survey { get; set; } = new();
+    [BindProperty] 
+    public SurveyForCreatedDto Survey { get; set; } = new();
     
     [BindProperty]
     public List<QuestionForCreatedDto> Questions { get; set; } = new()
@@ -34,8 +35,10 @@ public class SurveyConstructor(IServiceManager serviceManager) : PageModel
         }
     };
 
-    [BindProperty] public List<string> SelectedTags { get; set; } = new();
-    [BindProperty] public List<Guid> SelectedUsers { get; set; } = new();
+    [BindProperty] 
+    public List<string> SelectedTags { get; set; } = new();
+    [BindProperty] 
+    public List<Guid> SelectedUsers { get; set; } = new();
 
     public void OnGetAsync()
     {

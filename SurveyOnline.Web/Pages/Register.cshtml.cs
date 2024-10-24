@@ -17,8 +17,13 @@ public class Register(IServiceManager serviceManager) : PageModel
     
     public async Task<IActionResult> OnPost()
     {
-        await serviceManager.Authentication.RegisterAsync(User);
+        if (ModelState.IsValid)
+        {
+            await serviceManager.Authentication.RegisterAsync(User);
+ 
+            return RedirectToPage(nameof(Index));   
+        }
 
-        return RedirectToPage(nameof(Index));
+        return Page();
     }
 }

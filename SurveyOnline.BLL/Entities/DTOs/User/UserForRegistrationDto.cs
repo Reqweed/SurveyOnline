@@ -10,7 +10,4 @@ public record UserForRegistrationDto {
     public  string Email { get; init; }
     [Required]
     public string Password { get; init; }
-    [Required] 
-    [Compare(nameof(Password))] 
-    public string ConfirmPassword { get; init; }
 }
