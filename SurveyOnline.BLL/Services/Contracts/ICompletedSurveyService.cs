@@ -4,5 +4,5 @@ namespace SurveyOnline.BLL.Services.Contracts;
 
 public interface ICompletedSurveyService
 {
-    Task AddCompletedSurvey(SurveyForCompletedDto surveyDto, List<string> answers);
+    Task AddCompletedSurveyAsync(SurveyForCompletedDto surveyDto, List<string> answers);
 }

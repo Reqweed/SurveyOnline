@@ -40,28 +40,28 @@ public class UserService(SignInManager<User> signInManager, IMapper mapper) : IU
     {
         var user = await signInManager.UserManager.FindByIdAsync(userId.ToString());
         if (user == null)
-            throw new Exception();
+            throw new KeyNotFoundException($"User with ID '{userId}' not found.");
         
         var result = await signInManager.UserManager.DeleteAsync(user);
         if (!result.Succeeded)
-            throw new Exception();
+            throw new InvalidOperationException($"Failed to delete user with ID '{userId}'.");
     }
 
     public async Task SetUserStatusAsync(Guid userId, Status status)
     {
         var user = await signInManager.UserManager.FindByIdAsync(userId.ToString());
         if (user == null)
-            throw new Exception();
+            throw new KeyNotFoundException($"User with ID '{userId}' not found.");
 
         user.LockoutEnd = status switch
         {
             Status.Block => DateTimeOffset.MaxValue,
             Status.Unblock => null,
-            _ => throw new Exception()
+            _ => throw new ArgumentOutOfRangeException(nameof(status), "Invalid status value.")
         };
 
         var result = await signInManager.UserManager.UpdateAsync(user);
         if (!result.Succeeded)
-            throw new Exception();
+            throw new InvalidOperationException($"Failed to update user status for user with ID '{userId}'.");
     }
 }

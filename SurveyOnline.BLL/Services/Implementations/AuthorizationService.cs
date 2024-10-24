@@ -11,17 +11,28 @@ public class AuthorizationService(SignInManager<User> signInManager) : IAuthoriz
     {
         var user = await signInManager.UserManager.FindByIdAsync(userId.ToString());
         if (user is null)
-            throw new Exception();
-        
+            throw new KeyNotFoundException($"User with ID {userId} not found.");
+
+        await RemoveRoleToUserAsync(user);
+        await AssignRoleToUserAsync(user, roleType);
+    }
+
+    private async Task RemoveRoleToUserAsync(User user)
+    {
         var roles = await signInManager.UserManager.GetRolesAsync(user);
 
         foreach (var role in roles)
         {
-            await signInManager.UserManager.RemoveFromRoleAsync(user, role);
+            var removeResult = await signInManager.UserManager.RemoveFromRoleAsync(user, role);
+            if (!removeResult.Succeeded)
+                throw new InvalidOperationException($"Failed to remove role {role} from user {user.UserName}.");
         }
-        
+    }
+    
+    private async Task AssignRoleToUserAsync(User user, RoleType roleType)
+    {
         var result = await signInManager.UserManager.AddToRoleAsync(user, roleType.ToString());
-        if(!result.Succeeded) 
-            throw new Exception();
+        if (!result.Succeeded) 
+            throw new InvalidOperationException($"Failed to add role {roleType} to user {user.UserName}.");
     }
 }

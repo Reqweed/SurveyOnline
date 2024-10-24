@@ -23,7 +23,7 @@ public class PassingSurvey(IServiceManager serviceManager) : PageModel
     
     public async Task<IActionResult> OnPostAsync()
     {
-        await serviceManager.CompletedSurvey.AddCompletedSurvey(Survey, Answers);
+        await serviceManager.CompletedSurvey.AddCompletedSurveyAsync(Survey, Answers);
         
         return RedirectToPage(nameof(Index));
     }

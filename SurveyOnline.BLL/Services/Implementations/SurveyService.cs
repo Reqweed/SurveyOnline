@@ -19,24 +19,18 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
     {
         ValidateInput(surveyDto, questionsDto, tagNames);
 
-        var survey = MapSurvey(surveyDto, questionsDto);
+        var survey = await ConstructSurveyAsync(surveyDto, questionsDto, tagNames, userIds);
 
-        await AssignCreatorToSurvey(survey);
-        await AssignTagsToSurvey(survey, tagNames);
-        await AssignTopicToSurvey(survey, surveyDto.TopicName);
-        await AssignImageToSurvey(survey, surveyDto.Image);
-        await AssignUsersToSurvey(survey, userIds);
-        
         await repositoryManager.Survey.CreateSurveyAsync(survey);
-        
-        await AddSurveyForSearch(survey);
-        
+
+        await AddSurveyForSearchAsync(survey);
+
         await repositoryManager.SaveAsync();
     }
 
     public async Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(int countSurvey)
     {
-        var surveysTop = await (await GetAccessibleSurveys())
+        var surveysTop = await (await GetAccessibleSurveysAsync())
             .OrderByDescending(survey => survey.CompletedCount)
             .Take(countSurvey)
             .Include(survey => survey.Creator)
@@ -47,7 +41,7 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
 
     public async Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize)
     {
-        var surveys = await (await GetAccessibleSurveys())
+        var surveys = await (await GetAccessibleSurveysAsync())
             .OrderByDescending(survey => survey.CreatedDate)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
@@ -59,7 +53,7 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
 
     public async Task<SurveyForCompletedDto> GetSurveyAsync(Guid idSurvey)
     {
-        var survey = await (await GetAccessibleSurveys())
+        var survey = await (await GetAccessibleSurveysAsync())
             .Where(survey => survey.Id == idSurvey)
             .Include(survey => survey.Creator)
             .Include(survey => survey.Questions)
@@ -67,23 +61,23 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
             .Include(survey => survey.Tags)
             .FirstOrDefaultAsync();
         if (survey is null)
-            throw new Exception();
+            throw new KeyNotFoundException($"Survey with ID '{idSurvey}' not found.");
 
         var surveyDto = mapper.Map<Survey, SurveyForCompletedDto>(survey);
 
         return surveyDto;
     }
 
-    public async Task<IEnumerable<SurveyDto>> GetSurveysByTag(string tag)
+    public async Task<IEnumerable<SurveyDto>> GetSurveysByTagAsync(string tag)
     {
         var surveysIndexDto = await surveySearchService.SearchSurveyByTagAsync(tag);
 
         var surveysDto = mapper.Map<IEnumerable<SurveyForIndexDto>, IEnumerable<SurveyDto>>(surveysIndexDto);
 
         return surveysDto;
-    }    
-    
-    public async Task<IEnumerable<SurveyDto>> GetSurveysByTerm(string term)
+    }
+
+    public async Task<IEnumerable<SurveyDto>> GetSurveysByTermAsync(string term)
     {
         var surveysIndexDto = await surveySearchService.SearchSurveysAsync(term);
 
@@ -96,24 +90,30 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         List<string> tagNames)
     {
         if (surveyDto == null)
-            throw new Exception("Survey is null");
+            throw new ArgumentNullException(nameof(surveyDto), "Survey cannot be null.");
         if (questionsDto == null || questionsDto.Count == 0)
-            throw new Exception("Questions are missing");
+            throw new ArgumentException("At least one question is required.", nameof(questionsDto));
         if (tagNames == null || tagNames.Count == 0)
-            throw new Exception("Tags are missing");
+            throw new ArgumentException("At least one tag is required.", nameof(tagNames));
     }
 
-    private Survey MapSurvey(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto)
+    private async Task<Survey> ConstructSurveyAsync(SurveyForCreatedDto surveyDto,
+        List<QuestionForCreatedDto> questionsDto, List<string> tagNames, List<Guid> userIds)
     {
         var survey = mapper.Map<SurveyForCreatedDto, Survey>(surveyDto);
 
-        survey.Questions = mapper.Map<List<QuestionForCreatedDto>, List<Question>>(questionsDto);
+        await AssignCreatorToSurveyAsync(survey);
+        await AssignTagsToSurveyAsync(survey, tagNames);
+        await AssignTopicToSurveyAsync(survey, surveyDto.TopicName);
+        await AssignImageToSurveyAsync(survey, surveyDto.Image);
+        await AssignUsersToSurveyAsync(survey, userIds);
         survey.CreatedDate = DateTime.UtcNow;
+        survey.Questions = mapper.Map<List<QuestionForCreatedDto>, List<Question>>(questionsDto);
 
         return survey;
     }
 
-    private async Task AssignTagsToSurvey(Survey survey, List<string> tagNames)
+    private async Task AssignTagsToSurveyAsync(Survey survey, List<string> tagNames)
     {
         var existingTags = await repositoryManager.Tag.GetAllTags(true)
             .Where(tag => tagNames.Contains(tag.Name))
@@ -127,18 +127,17 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         survey.Tags = existingTags;
     }
 
-    private async Task AssignTopicToSurvey(Survey survey, string topicName)
+    private async Task AssignTopicToSurveyAsync(Survey survey, string topicName)
     {
         var topic = await repositoryManager.Topic.GetAllTopics(true)
             .FirstOrDefaultAsync(t => t.Name == topicName);
-
         if (topic == null)
-            throw new Exception();
+            throw new ArgumentException("Topic not found.", nameof(topicName));
 
         survey.Topic = topic;
     }
 
-    private async Task AssignImageToSurvey(Survey survey, IFormFile? image)
+    private async Task AssignImageToSurveyAsync(Survey survey, IFormFile? image)
     {
         if (image is not null)
         {
@@ -146,16 +145,16 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         }
     }
 
-    private async Task AssignCreatorToSurvey(Survey survey)
+    private async Task AssignCreatorToSurveyAsync(Survey survey)
     {
         var creator = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
         if (creator is null)
-            throw new Exception();
+            throw new InvalidOperationException("User not found or not authenticated.");
 
         survey.Creator = creator;
     }
 
-    private async Task AssignUsersToSurvey(Survey survey, List<Guid>? userIds)
+    private async Task AssignUsersToSurveyAsync(Survey survey, List<Guid>? userIds)
     {
         if (userIds is not null && userIds.Count != 0)
         {
@@ -166,14 +165,14 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
             survey.AccessibleUsers = users;
         }
     }
-    
-    private async Task AddSurveyForSearch(Survey survey)
-    { 
+
+    private async Task AddSurveyForSearchAsync(Survey survey)
+    {
         var surveyIndexDto = mapper.Map<Survey, SurveyForIndexDto>(survey);
         await surveySearchService.AddIndexAsync(surveyIndexDto);
     }
 
-    private async Task<IQueryable<Survey>> GetAccessibleSurveys()
+    private async Task<IQueryable<Survey>> GetAccessibleSurveysAsync()
     {
         var user = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
         var surveys = repositoryManager.Survey.GetAllSurveys(false);

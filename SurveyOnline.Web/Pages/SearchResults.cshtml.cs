@@ -13,7 +13,7 @@ public class SearchResults(IServiceManager serviceManager) : PageModel
     {
         if (!string.IsNullOrEmpty(tag))
         {
-            Surveys = (await serviceManager.Survey.GetSurveysByTag(tag)).ToList();
+            Surveys = (await serviceManager.Survey.GetSurveysByTagAsync(tag)).ToList();
         }
     }
     
@@ -21,7 +21,7 @@ public class SearchResults(IServiceManager serviceManager) : PageModel
     {
         if (!string.IsNullOrEmpty(search))
         {
-            Surveys = (await serviceManager.Survey.GetSurveysByTerm(search)).ToList();
+            Surveys = (await serviceManager.Survey.GetSurveysByTermAsync(search)).ToList();
         }
 
         return Page();

@@ -10,15 +10,18 @@ public class SurveySearchService(ElasticsearchClient client) : ISurveySearchServ
     
     public async Task AddIndexAsync(SurveyForIndexDto surveyDto)
     {
-        var resp = await client.IndexAsync(surveyDto);
-        if (!resp.IsValidResponse)
-            throw new Exception();
+        if (surveyDto == null)
+            throw new ArgumentNullException(nameof(surveyDto), "Survey cannot be null.");
+        
+        var response = await client.IndexAsync(surveyDto);
+        if (!response.IsValidResponse)
+            throw new InvalidOperationException($"Failed to add index: {response.DebugInformation}");
     }
 
     public async Task<IEnumerable<SurveyForIndexDto>> SearchSurveyByTagAsync(string tagName)
     {
         if (string.IsNullOrEmpty(tagName))
-            throw new Exception();
+            throw new ArgumentException("Tag name cannot be null or empty.", nameof(tagName));
         
         var response = await client.SearchAsync<SurveyForIndexDto>(s => s
             .Index(Index)
@@ -31,7 +34,7 @@ public class SurveySearchService(ElasticsearchClient client) : ISurveySearchServ
         );
         
         if (!response.IsValidResponse)
-            throw new Exception();
+            throw new InvalidOperationException($"Search failed: {response.DebugInformation}");
 
         return response.Documents.AsEnumerable();
     }
@@ -39,7 +42,7 @@ public class SurveySearchService(ElasticsearchClient client) : ISurveySearchServ
     public async Task<IEnumerable<SurveyForIndexDto>> SearchSurveysAsync(string searchTerm)
     {
         if (string.IsNullOrEmpty(searchTerm))
-            throw new Exception();
+            throw new ArgumentException("Term for searching cannot be null or empty.", nameof(searchTerm));
         
         var response = await client.SearchAsync<SurveyForIndexDto>(s => s
             .Index(Index)
@@ -76,7 +79,7 @@ public class SurveySearchService(ElasticsearchClient client) : ISurveySearchServ
         );
 
         if (!response.IsValidResponse)
-            throw new Exception();
+            throw new InvalidOperationException($"Search failed: {response.DebugInformation}");
 
         return response.Documents.AsEnumerable();
     }

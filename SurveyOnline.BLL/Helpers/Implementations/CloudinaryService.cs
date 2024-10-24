@@ -23,7 +23,7 @@ public class CloudinaryService : ICloudinaryService
     public async Task<string> LoadImageAsync(IFormFile image)
     {
         if (image == null || image.Length == 0)
-            throw new Exception("Image is required.");
+            throw new ArgumentException("Image is required.", nameof(image));
 
         await using var stream = image.OpenReadStream();
         var uploadParams = new ImageUploadParams
@@ -34,7 +34,7 @@ public class CloudinaryService : ICloudinaryService
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
         if (uploadResult.Error != null)
-            throw new Exception(uploadResult.Error.Message);
+            throw new InvalidOperationException(uploadResult.Error.Message);
 
         return uploadResult.SecureUrl.ToString();
     }

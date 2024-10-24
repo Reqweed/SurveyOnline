@@ -9,6 +9,6 @@ public interface ISurveyService
     Task<IEnumerable<SurveyDto>> GetTopCompletedSurveysAsync(int countSurvey);
     Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize);
     Task<SurveyForCompletedDto> GetSurveyAsync(Guid idSurvey);
-    Task<IEnumerable<SurveyDto>> GetSurveysByTag(string tag);
-    Task<IEnumerable<SurveyDto>> GetSurveysByTerm(string term);
+    Task<IEnumerable<SurveyDto>> GetSurveysByTagAsync(string tag);
+    Task<IEnumerable<SurveyDto>> GetSurveysByTermAsync(string term);
 }
