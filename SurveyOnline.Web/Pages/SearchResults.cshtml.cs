@@ -7,7 +7,8 @@ namespace SurveyOnline.Web.Pages;
 
 public class SearchResults(IServiceManager serviceManager) : PageModel
 {
-    [BindProperty] public List<SurveyDto> Surveys { get; set; } = new();
+    [BindProperty] 
+    public List<SurveyDto> Surveys { get; set; } = new();
 
     public async Task OnGet([FromQuery] string tag)
     {

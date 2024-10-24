@@ -1,7 +1,11 @@
 ﻿@using System.Security.Claims
 @using SurveyOnline.DAL.Entities.Enums
+@using Index = SurveyOnline.Web.Pages.Index
+@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,44 +23,49 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link" asp-page="@nameof(Index)"><i class="fas fa-home"></i> Main</a>
+                        <a class="nav-link" asp-page="@nameof(Index)"><i class="fas fa-home"></i> @Localizer["Main"]</a>
                     </li>
                     @if (!User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="@nameof(Login)"><i class="fas fa-sign-in-alt"></i> Login</a>
+                            <a class="nav-link" asp-page="@nameof(Login)"><i class="fas fa-sign-in-alt"></i> @Localizer["Login"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="@nameof(Register)"><i class="fas fa-user-plus"></i> Registration</a>
+                            <a class="nav-link" asp-page="@nameof(Register)"><i class="fas fa-user-plus"></i> @Localizer["Registration"]</a>
                         </li>
                     }
                     @if (User.Identity.IsAuthenticated && User.FindFirst(ClaimTypes.Role)?.Value == RoleType.Admin.ToString())
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="@nameof(AdminPanel)"><i class="fas fa-cog"></i> Admin Panel</a>
+                            <a class="nav-link" asp-page="@nameof(AdminPanel)"><i class="fas fa-cog"></i> @Localizer["Admin Panel"]</a>
                         </li>
                     }
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="@nameof(SurveyConstructor)"><i class="fas fa-pencil-alt"></i> Survey Constructor</a>
+                            <a class="nav-link" asp-page="@nameof(SurveyConstructor)"><i class="fas fa-pencil-alt"></i> @Localizer["Survey Constructor"]</a>
                         </li>
                         <li class="nav-item">
                             <form method="post" asp-page="@nameof(Index)" asp-page-handler="Logout" class="nav-link">
-                                <button type="submit" class="btn p-0" style="color: inherit;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                                <button type="submit" class="btn p-0" style="color: inherit;"><i class="fas fa-sign-out-alt"></i> @Localizer["Logout"]</button>
                             </form>
                         </li>
                     }
                 </ul>
-                
+                <form id="languageForm" class="me-2" method="post" asp-page="@nameof(Index)" asp-page-handler="SetLanguage">
+                    <select name="culture" class="form-select" onchange="document.getElementById('languageForm').submit();">
+                        <option value="en" selected="@(CultureInfo.CurrentUICulture.Name == "en")">English</option>
+                        <option value="ru" selected="@(CultureInfo.CurrentUICulture.Name == "ru")">Русский</option>
+                    </select>
+                </form>
                 <form method="post" asp-page="@nameof(SearchResults)" asp-page-handler="SearchByTerm" class="d-flex ms-auto">
-                    <input class="form-control me-2" type="search" name="search" placeholder="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <input class="form-control me-2" type="search" name="search" placeholder="@Localizer["Search"]">
+                    <button class="btn btn-outline-success" type="submit">@Localizer["Search"]</button>
                 </form>
             </div>
         </div>
         <button id="themeToggle" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center me-3" style="white-space: nowrap; font-size: 0.875rem; padding: 0.25rem 0.75rem;">
-            <i class="fas fa-adjust me-2"></i> Toggle Theme
+            <i class="fas fa-adjust me-2"></i> @Localizer["Theme"]
         </button>
     </nav>
 </header>

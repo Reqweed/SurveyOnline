@@ -1,5 +1,7 @@
 @using Markdig
+@using Microsoft.AspNetCore.Mvc.Localization
 @model SurveyOnline.BLL.Entities.DTOs.Survey.SurveyDto
+@inject IViewLocalizer Localizer
 
 <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
     <div class="card h-100 shadow-sm">
@@ -21,9 +23,9 @@
                 </div>
             </div>
             <p class="card-text">
-                <small class="text-muted">Author: @Model.AuthorName</small>
+                <small class="text-muted">@Localizer["Author"]: @Model.AuthorName</small>
             </p>
-            <a asp-page="@nameof(PassingSurvey)" asp-route-id="@Model.Id" class="btn btn-primary mt-auto">Go to survey</a>
+            <a asp-page="@nameof(PassingSurvey)" asp-route-id="@Model.Id" class="btn btn-primary mt-auto">@Localizer["GoToSurvey"]</a>
         </div>
     </div>
 </div>

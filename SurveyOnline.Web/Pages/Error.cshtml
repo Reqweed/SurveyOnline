@@ -1,16 +1,18 @@
 @page
 @model Error
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "Shared/_Layout";
 }
 
 <div class="container d-flex flex-column align-items-center justify-content-center vh-100">
     <div class="text-center">
-        <h1 class="display-4 text-danger">Oops!</h1>
-        <h2 class="mb-4">Something went wrong</h2>
+        <h1 class="display-4 text-danger">@Localizer["Oops"]!</h1>
+        <h2 class="mb-4">@Localizer["Something went wrong"]</h2>
         <div class="mt-5">
             <a href="javascript:history.back()" class="btn btn-secondary btn-lg ml-3">
-                <i class="fas fa-arrow-left"></i> Go Back
+                <i class="fas fa-arrow-left"></i> @Localizer["Go Back"]
             </a>
         </div>
     </div>

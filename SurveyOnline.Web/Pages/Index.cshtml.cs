@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using SurveyOnline.BLL.Entities.DTOs.Survey;
@@ -33,5 +34,16 @@ public class Index(IServiceManager serviceManager, SignInManager<User> signInMan
         await serviceManager.Authentication.LogoutAsync();
         
         return RedirectToPage();
+    }
+    
+    public IActionResult OnPostSetLanguage(string culture)
+    {
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+        );
+
+        return Redirect(Request.Headers["Referer"].ToString());
     }
 }

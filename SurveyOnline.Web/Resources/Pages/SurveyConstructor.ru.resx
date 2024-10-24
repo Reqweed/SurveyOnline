@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="Create Survey" xml:space="preserve">
+        <value>Создать опрос</value>
+        <comment>Create Survey</comment>
+    </data>
+    <data name="Enter survey title" xml:space="preserve">
+        <value>Введите название опроса</value>
+        <comment>Enter survey title</comment>
+    </data>
+    <data name="Enter description" xml:space="preserve">
+        <value>Введите описание</value>
+        <comment>Enter description</comment>
+    </data>
+    <data name="Is Public" xml:space="preserve">
+        <value>Публичный?</value>
+        <comment>Is Public</comment>
+    </data>
+    <data name="Accessible Users" xml:space="preserve">
+        <value>Доступно пользователям</value>
+        <comment>Accessible Users</comment>
+    </data>
+    <data name="Questions" xml:space="preserve">
+        <value>Вопросы</value>
+        <comment>Questions</comment>
+    </data>
+    <data name="Title" xml:space="preserve">
+        <value>Название</value>
+        <comment>Title</comment>
+    </data>
+    <data name="Description" xml:space="preserve">
+        <value>Описание</value>
+        <comment>Description</comment>
+    </data>
+    <data name="Type" xml:space="preserve">
+        <value>Тип</value>
+        <comment>Type</comment>
+    </data>
+    <data name="Remove Question" xml:space="preserve">
+        <value>Удалить вопрос</value>
+        <comment>Remove Question</comment>
+    </data>
+    <data name="Submit" xml:space="preserve">
+        <value>Отправить</value>
+        <comment>Submit</comment>
+    </data>
+    <data name="Add Question" xml:space="preserve">
+        <value>Добавить вопрос</value>
+        <comment>Add Question</comment>
+    </data>
+    <data name="Selected Tags" xml:space="preserve">
+        <value>Выбранные теги</value>
+        <comment>Selected Tags</comment>
+    </data>
+    <data name="Image" xml:space="preserve">
+        <value>Картинка</value>
+        <comment>Image</comment>
+    </data>
+    <data name="Topic" xml:space="preserve">
+        <value>Тема</value>
+        <comment>Topic</comment>
+    </data>
+</root>

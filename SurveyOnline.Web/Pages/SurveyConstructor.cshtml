@@ -1,6 +1,8 @@
 @page
 @model SurveyConstructor
 @using SurveyOnline.DAL.Entities.Enums
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "Shared/_Layout";
 }
@@ -27,23 +29,23 @@
     <form method="post" enctype="multipart/form-data">
         <div class="card mb-4">
             <div class="card-header">
-                <h2>Create Survey</h2>
+                <h2>@Localizer["Create Survey"]</h2>
             </div>
             <div class="card-body">
                 <div class="form-group mb-3">
-                    <label asp-for="Survey.Title" class="form-label"></label>
-                    <input asp-for="Survey.Title" class="form-control" placeholder="Enter survey title" />
+                    <label asp-for="Survey.Title" class="form-label">@Localizer["Title"]</label>
+                    <input asp-for="Survey.Title" class="form-control" placeholder="@Localizer["Enter survey title"]" />
                     <span asp-validation-for="Survey.Title" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label asp-for="Survey.Description" class="form-label"></label>
-                    <textarea asp-for="Survey.Description" id="markdown-editor" class="form-control" rows="5" placeholder="Enter description"></textarea>
+                    <label asp-for="Survey.Description" class="form-label">@Localizer["Description"]</label>
+                    <textarea asp-for="Survey.Description" id="markdown-editor" class="form-control" rows="5" placeholder="@Localizer["Enter description"]"></textarea>
                     <span asp-validation-for="Survey.Description" class="text-danger"></span>
                 </div>
                 
                 <div class="form-group mb-3">
-                    <label asp-for="Survey.TopicName" class="form-label"></label>
+                    <label asp-for="Survey.TopicName" class="form-label">@Localizer["Topic"]</label>
                     <select asp-for="Survey.TopicName" class="form-select">
                         @foreach (var topic in Model.Topics)
                         {
@@ -55,25 +57,25 @@
 
                 <div class="form-check mb-3">
                     <input asp-for="Survey.IsPublic" class="form-check-input" id="isPublicCheckbox" />
-                    <label asp-for="Survey.IsPublic" class="form-check-label">Is Public</label>
+                    <label asp-for="Survey.IsPublic" class="form-check-label">@Localizer["Is Public"]</label>
                 </div>
 
                 @if (!Model.Survey.IsPublic)
                 {
                     <div class="form-group mb-3" id="select-users-container">
-                        <label asp-for="SelectedUsers" class="form-label">Accessible Users</label>
+                        <label asp-for="SelectedUsers" class="form-label">@Localizer["Accessible Users"]</label>
                         <select asp-for="SelectedUsers" class="form-select" id="selectedUsers" name="SelectedUsers" multiple></select>
                     </div>
                 }
 
                 <div class="form-group mb-3">
-                    <label asp-for="Survey.Image" class="form-label"></label>
+                    <label asp-for="Survey.Image" class="form-label">@Localizer["Image"]</label>
                     <input asp-for="Survey.Image" type="file" class="form-control" accept=".jpg, .jpeg, .png" />
                     <span asp-validation-for="Survey.Image" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mb-3">
-                    <label asp-for="SelectedTags" class="form-label"></label>
+                    <label asp-for="SelectedTags" class="form-label">@Localizer["Selected Tags"]</label>
                     <select class="form-select tags-select" name="SelectedTags" multiple="multiple">
                         @foreach (var tag in Model.Tags)
                         {
@@ -87,7 +89,7 @@
 
         <div class="card mb-4">
             <div class="card-header">
-                <h3>Questions</h3>
+                <h3>@Localizer["Questions"]</h3>
             </div>
             <div class="card-body">
                 <div id="questions-container" class="mb-3">
@@ -96,13 +98,13 @@
                         @for (var i = 0; i < Model.Questions.Count; i++)
                         {
                             <div class="form-group mb-3 question-item card p-3 border">
-                                <label>Title</label>
+                                <label>@Localizer["Title"]</label>
                                 <input class="form-control" type="text" asp-for="Questions[i].Title" value="@Model.Questions[i].Title" />
                 
-                                <label>Description</label>
+                                <label>@Localizer["Description"]</label>
                                 <input class="form-control" type="text" asp-for="Questions[i].Description" value="@Model.Questions[i].Description" />
                 
-                                <label>Type</label>
+                                <label>@Localizer["Type"]</label>
                                 <select class="form-select" asp-for="Questions[i].Type">
                                     @foreach (var type in Enum.GetNames(typeof(QuestionType)))
                                     {
@@ -112,17 +114,17 @@
                 
                                 <div class="form-check">
                                     <input asp-for="Questions[i].IsVisible" class="form-check-input" type="checkbox" name="Questions[@i].IsVisible" checked="@(Model.Questions[i].IsVisible ? "checked" : null)" />
-                                    <label class="form-check-label">Is Visible</label>
+                                    <label class="form-check-label">@Localizer["Is Visible"]</label>
                                 </div>
-                                <button type="submit" class="btn btn-danger mt-2 remove-question" asp-page-handler="RemoveQuestion" name="questionIndex" value="@i">Remove Question</button>
+                                <button type="submit" class="btn btn-danger mt-2 remove-question" asp-page-handler="RemoveQuestion" name="questionIndex" value="@i">@Localizer["Remove Question"]</button>
                             </div>
                         }
                     }
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-success" asp-page-handler="SubmitForm">Submit</button>
-                    <button type="submit" class="btn btn-primary" asp-page-handler="AddQuestion">Add Question</button>
+                    <button type="submit" class="btn btn-success" asp-page-handler="SubmitForm">@Localizer["Submit"]</button>
+                    <button type="submit" class="btn btn-primary" asp-page-handler="AddQuestion">@Localizer["Add Question"]</button>
                 </div>
             </div>
         </div>

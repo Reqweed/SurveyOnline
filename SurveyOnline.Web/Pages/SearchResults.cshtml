@@ -1,12 +1,13 @@
 @page
 @model SurveyOnline.Web.Pages.SearchResults
-
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @{
     Layout = "Shared/_Layout";
 }
 
 <div class="container my-5">
-    <h3 class="text-center mb-4">Results</h3>
+    <h3 class="text-center mb-4">@Localizer["Results"]</h3>
     <div class="row g-4">
         @foreach (var survey in Model.Surveys)
         {

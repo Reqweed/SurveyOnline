@@ -101,4 +101,9 @@ public static class ServiceExtensions
     {
         serviceCollection.AddScoped<IDbInitializer, DbInitializer>();
     }
+
+    public static void AddLocalizations(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddLocalization(options => options.ResourcesPath = "Resources");
+    }
 }

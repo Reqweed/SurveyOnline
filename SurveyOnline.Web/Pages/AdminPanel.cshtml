@@ -1,4 +1,6 @@
 @page
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 @model SurveyOnline.Web.Pages.AdminPanel
 
 @{
@@ -10,11 +12,11 @@
         <div class="col-12">
             <form method="post">
                 <div class="d-flex flex-wrap gap-2 mb-3">
-                    <button type="submit" class="btn btn-secondary" asp-page-handler="Block">Block</button>
-                    <button type="submit" class="btn btn-secondary" asp-page-handler="Unblock">Unblock</button>
-                    <button type="submit" class="btn btn-danger" asp-page-handler="Delete">Delete</button>
-                    <button type="submit" class="btn btn-secondary" asp-page-handler="MakeAdmin">Make Admin</button>
-                    <button type="submit" class="btn btn-secondary" asp-page-handler="MakeUser">Make User</button>
+                    <button type="submit" class="btn btn-secondary" asp-page-handler="Block">@Localizer["Block"]</button>
+                    <button type="submit" class="btn btn-secondary" asp-page-handler="Unblock">@Localizer["Unblock"]</button>
+                    <button type="submit" class="btn btn-danger" asp-page-handler="Delete">@Localizer["Delete"]</button>
+                    <button type="submit" class="btn btn-secondary" asp-page-handler="MakeAdmin">@Localizer["Make Admin"]</button>
+                    <button type="submit" class="btn btn-secondary" asp-page-handler="MakeUser">@Localizer["Make User"]</button>
                 </div>
 
                 <div class="table-responsive">
@@ -24,10 +26,10 @@
                             <th>
                                 <input class="form-check-input" type="checkbox" />
                             </th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
+                            <th>@Localizer["Name"]</th>
+                            <th>@Localizer["Email"]</th>
+                            <th>@Localizer["Role"]</th>
+                            <th>@Localizer["Status"]</th>
                         </tr>
                         </thead>
                         <tbody>
