@@ -1,6 +1,5 @@
 ﻿@page
 @using System.Text.Json
-@using Markdig
 @model Index
 
 @{
@@ -9,7 +8,6 @@
 
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" rel="stylesheet" />
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -30,32 +28,7 @@
         <div class="row g-4">
             @foreach (var survey in Model.SurveysTop)
             {
-                <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">@survey.Title</h5>
-                            @if (survey.UrlImage is null)
-                            {
-                                <div class="d-flex align-items-center justify-content-center text-secondary flex-grow-1" style="max-height: 35%;">
-                                    <i class="fas fa-image fa-5x"></i>
-                                </div>
-                            }
-                            else
-                            {
-                                <img src="@survey.UrlImage" class="img-fluid mb-3" style="max-height: 35%; object-fit: contain;" alt="Survey image" />
-                            }
-                            <div class="flex-grow-1" style="max-height: 40%;">
-                                <div class="card-text text-truncate" style="max-height: 100%;">
-                                    @Html.Raw(Markdown.ToHtml(survey.Description))
-                                </div>
-                            </div>
-                            <p class="card-text">
-                                <small class="text-muted">Author: @survey.AuthorName</small>
-                            </p>
-                            <a asp-page="@nameof(PassingSurvey)" asp-route-id="@survey.Id" class="btn btn-primary mt-auto">Go to survey</a>
-                        </div>
-                    </div>
-                </div>
+                await Html.RenderPartialAsync("_SurveyCard", survey);
             }
         </div>
     </div>
@@ -138,19 +111,10 @@
                 weightFactor: 1.5,
                 color: 'random-dark',
                 shape: "circle",
-                ellipticity: 0.8,
+                ellipticity: 0.5,
                 shrinkToFit: true,
                 click: async (item) => {
-                    const response = await fetch('@Url.Page(nameof(Index))?handler=SelectedTag', {
-                        method: "POST",
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': getToken()
-                        },
-                        body: JSON.stringify({ 'selectedTag': item[0] })
-                    });
-                    const data = await response.json();
-                    window.location.href = data;
+                    window.location.href = `@Url.Page(nameof(SearchResults))?tag=${item[0]}`;
                 }
             });
         };

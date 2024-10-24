@@ -48,9 +48,16 @@
                         </li>
                     }
                 </ul>
+                
+                <form method="post" asp-page="@nameof(SearchResults)" asp-page-handler="SearchByTerm" class="d-flex ms-auto">
+                    <input class="form-control me-2" type="search" name="search" placeholder="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
             </div>
         </div>
-        <button id="themeToggle" class="btn btn-outline-secondary me-3" style="margin-left: auto;"><i class="fas fa-adjust"></i> Toggle Theme</button>
+        <button id="themeToggle" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center me-3" style="white-space: nowrap; font-size: 0.875rem; padding: 0.25rem 0.75rem;">
+            <i class="fas fa-adjust me-2"></i> Toggle Theme
+        </button>
     </nav>
 </header>
 <div class="container">

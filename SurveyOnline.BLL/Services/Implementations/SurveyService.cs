@@ -12,7 +12,7 @@ using SurveyOnline.DAL.Repositories.Contracts;
 namespace SurveyOnline.BLL.Services.Implementations;
 
 public class SurveyService(SignInManager<User> signInManager, IRepositoryManager repositoryManager,
-    ICloudinaryService cloudinaryService, IMapper mapper) : ISurveyService
+    ICloudinaryService cloudinaryService, ISurveySearchService surveySearchService, IMapper mapper) : ISurveyService
 {
     public async Task CreateSurveyAsync(SurveyForCreatedDto surveyDto,
         List<QuestionForCreatedDto> questionsDto, List<string> tagNames, List<Guid> userIds)
@@ -26,8 +26,11 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         await AssignTopicToSurvey(survey, surveyDto.TopicName);
         await AssignImageToSurvey(survey, surveyDto.Image);
         await AssignUsersToSurvey(survey, userIds);
-
+        
         await repositoryManager.Survey.CreateSurveyAsync(survey);
+        
+        await AddSurveyForSearch(survey);
+        
         await repositoryManager.SaveAsync();
     }
 
@@ -45,7 +48,7 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
     public async Task<IEnumerable<SurveyDto>> GetPagedAccessibleSurveysAsync(int currentPage, int pageSize)
     {
         var surveys = await (await GetAccessibleSurveys())
-            .OrderBy(survey => survey.CreatedDate)
+            .OrderByDescending(survey => survey.CreatedDate)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .Include(survey => survey.Creator)
@@ -69,6 +72,24 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
         var surveyDto = mapper.Map<Survey, SurveyForCompletedDto>(survey);
 
         return surveyDto;
+    }
+
+    public async Task<IEnumerable<SurveyDto>> GetSurveysByTag(string tag)
+    {
+        var surveysIndexDto = await surveySearchService.SearchSurveyByTagAsync(tag);
+
+        var surveysDto = mapper.Map<IEnumerable<SurveyForIndexDto>, IEnumerable<SurveyDto>>(surveysIndexDto);
+
+        return surveysDto;
+    }    
+    
+    public async Task<IEnumerable<SurveyDto>> GetSurveysByTerm(string term)
+    {
+        var surveysIndexDto = await surveySearchService.SearchSurveysAsync(term);
+
+        var surveysDto = mapper.Map<IEnumerable<SurveyForIndexDto>, IEnumerable<SurveyDto>>(surveysIndexDto);
+
+        return surveysDto;
     }
 
     private void ValidateInput(SurveyForCreatedDto surveyDto, List<QuestionForCreatedDto> questionsDto,
@@ -144,6 +165,12 @@ public class SurveyService(SignInManager<User> signInManager, IRepositoryManager
 
             survey.AccessibleUsers = users;
         }
+    }
+    
+    private async Task AddSurveyForSearch(Survey survey)
+    { 
+        var surveyIndexDto = mapper.Map<Survey, SurveyForIndexDto>(survey);
+        await surveySearchService.AddIndexAsync(surveyIndexDto);
     }
 
     private async Task<IQueryable<Survey>> GetAccessibleSurveys()

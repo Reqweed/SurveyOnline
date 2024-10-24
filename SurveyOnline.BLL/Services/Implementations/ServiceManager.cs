@@ -7,31 +7,25 @@ using SurveyOnline.DAL.Repositories.Contracts;
 
 namespace SurveyOnline.BLL.Services.Implementations;
 
-public class ServiceManager : IServiceManager
+public class ServiceManager(SignInManager<User> signInManager, IRepositoryManager repositoryManager,
+        ICloudinaryService cloudinaryService, ISurveySearchService surveySearchService, IMapper mapper)
+    : IServiceManager
 {
-    private readonly Lazy<IAuthenticationService> _authenticationService;
-    private readonly Lazy<IAuthorizationService> _authorizationService;
-    private readonly Lazy<IUserService> _userService;
-    private readonly Lazy<ISurveyService> _surveyService;
-    private readonly Lazy<ITopicService> _topicService;
-    private readonly Lazy<ITagService> _tagService;
-    private readonly Lazy<ICompletedSurveyService> _completedSurveyService;
-
-    public ServiceManager(SignInManager<User> signInManager, IRepositoryManager repositoryManager,
-        ICloudinaryService cloudinaryService, IMapper mapper)
-    {
-        _authenticationService =
-            new Lazy<IAuthenticationService>(() => new AuthenticationService(signInManager, mapper));
-        _authorizationService = new Lazy<IAuthorizationService>(() => new AuthorizationService(signInManager));
-        _userService = new Lazy<IUserService>(() => new UserService(signInManager, mapper));
-        _surveyService = new Lazy<ISurveyService>(() =>
-            new SurveyService(signInManager, repositoryManager, cloudinaryService, mapper));
-        _topicService = new Lazy<ITopicService>(() => new TopicService(repositoryManager, mapper));
-        _tagService = new Lazy<ITagService>(() => new TagService(repositoryManager, mapper));
-        _completedSurveyService =
-            new Lazy<ICompletedSurveyService>(
-                () => new CompletedSurveyService(signInManager, repositoryManager, mapper));
-    }
+    private readonly Lazy<IAuthenticationService> _authenticationService
+        = new(() => new AuthenticationService(signInManager, mapper));
+    private readonly Lazy<IAuthorizationService> _authorizationService
+        = new(() => new AuthorizationService(signInManager));
+    private readonly Lazy<IUserService> _userService
+        = new(() => new UserService(signInManager, mapper));
+    private readonly Lazy<ISurveyService> _surveyService
+        = new(() => new SurveyService(signInManager, repositoryManager, 
+            cloudinaryService, surveySearchService, mapper));
+    private readonly Lazy<ITopicService> _topicService
+        = new(() => new TopicService(repositoryManager, mapper));
+    private readonly Lazy<ITagService> _tagService
+        = new(() => new TagService(repositoryManager, mapper));
+    private readonly Lazy<ICompletedSurveyService> _completedSurveyService
+        = new(() => new CompletedSurveyService(signInManager, repositoryManager, mapper));
 
     public IAuthenticationService Authentication => _authenticationService.Value;
     public IAuthorizationService Authorization => _authorizationService.Value;

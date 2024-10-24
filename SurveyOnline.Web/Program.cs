@@ -11,6 +11,7 @@ builder.Services.AddRepositoryManager();
 builder.Services.AddServiceManger();
 builder.Services.AddHelpers();
 builder.Services.AddMiddlewares();
+builder.Services.AddElasticSearch();
 
 var app = builder.Build();
 

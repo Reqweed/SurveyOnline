@@ -13,6 +13,11 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
+        CreateMap<QuestionForCreatedDto, Question>();
+        CreateMap<Question, QuestionDto>();
+        
+        CreateMap<Topic, TopicDto>();
+        
         CreateMap<UserForRegistrationDto, User>();
         CreateMap<UserForLoginDto, User>();
         CreateMap<User, UserForSearchingDto>();
@@ -25,8 +30,6 @@ public class MapperProfile : Profile
                 src.LockoutEnd > DateTimeOffset.UtcNow ? Status.Block : Status.Unblock)
             );
 
-        CreateMap<Topic, TopicDto>();
-
         CreateMap<Tag, TagDto>();
         CreateMap<Tag, TagForCloudDto>()
             .ConstructUsing(src => new TagForCloudDto(
@@ -36,6 +39,7 @@ public class MapperProfile : Profile
             );
 
         CreateMap<SurveyForCreatedDto, Survey>();
+        CreateMap<SurveyForIndexDto, SurveyDto>();
         CreateMap<Survey, SurveyDto>()
             .ConstructUsing(src => new SurveyDto(
                 src.Id,
@@ -55,8 +59,16 @@ public class MapperProfile : Profile
                 context.Mapper.Map<List<QuestionDto>>(src.Questions),
                 context.Mapper.Map<List<TagDto>>(src.Tags))
             );
-
-        CreateMap<QuestionForCreatedDto, Question>();
-        CreateMap<Question, QuestionDto>();
+        CreateMap<Survey, SurveyForIndexDto>()
+            .ConstructUsing((src, context) => new SurveyForIndexDto(
+                src.Id,
+                src.Title,
+                src.Description,
+                src.UrlImage,
+                src.Creator.UserName,
+                context.Mapper.Map<TopicDto>(src.Topic),
+                context.Mapper.Map<List<QuestionDto>>(src.Questions),
+                context.Mapper.Map<List<TagDto>>(src.Tags))
+            );
     }
 }

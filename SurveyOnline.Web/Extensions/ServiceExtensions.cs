@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Microsoft.EntityFrameworkCore;
 using SurveyOnline.BLL.Helpers.Contracts;
 using SurveyOnline.BLL.Helpers.Implementations;
@@ -24,7 +25,11 @@ public static class ServiceExtensions
         serviceCollection.AddDbContext<PostgresDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
-            options.UseTriggers(triggerOptions => triggerOptions.AddTrigger<SurveyCompletedTrigger>());
+            options.UseTriggers(triggerOptions =>
+            {
+                triggerOptions.AddTrigger<SurveyCompletedTrigger>();
+                triggerOptions.AddTrigger<TagUsageTrigger>();
+            });
         });
     }
     
@@ -71,5 +76,20 @@ public static class ServiceExtensions
     {
         serviceCollection.AddTransient<CheckUserLockoutMiddleware>();
     }
-    
+
+    public static void AddElasticSearch(this IServiceCollection serviceCollection)
+    {
+        var settings =
+            new ElasticsearchClientSettings(
+                    new Uri("https://2f34029957a2482981e6bef1ee51361b.us-central1.gcp.cloud.es.io:443"))
+                .DefaultIndex("survey")
+                .Authentication(new ApiKey("aTc2a3VaSUI2dUVxVFpvRlBIVEM6WTlEWnJhTm5RU2lFRFBtWEtGNmc0QQ=="))
+                .EnableDebugMode()
+                .PrettyJson()
+                .DisableDirectStreaming();
+
+        var client = new ElasticsearchClient(settings);
+        
+        serviceCollection.AddSingleton<ISurveySearchService>(new SurveySearchService(client));
+    }
 }

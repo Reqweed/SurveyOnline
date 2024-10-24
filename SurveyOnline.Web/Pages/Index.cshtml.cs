@@ -28,14 +28,6 @@ public class Index(IServiceManager serviceManager, SignInManager<User> signInMan
         return new JsonResult(surveys);
     }
 
-    [ValidateAntiForgeryToken]
-    public IActionResult OnPostSelectedTag([FromBody] string selectedTag)
-    {
-        var redirectUrl = Url.Page(nameof(SurveyConstructor));
-        
-        return new JsonResult(redirectUrl);
-    }
-
     public async Task<IActionResult> OnPostLogoutAsync()
     {
         await serviceManager.Authentication.LogoutAsync();

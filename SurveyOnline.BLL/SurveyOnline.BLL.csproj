@@ -9,6 +9,7 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="13.0.1" />
       <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
+      <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.15.10" />
     </ItemGroup>
 
     <ItemGroup>
